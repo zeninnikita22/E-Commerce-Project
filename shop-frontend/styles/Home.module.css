@@ -1,0 +1,12 @@
+.categoriesbox {
+  display: flex;
+  justify-content: center;
+  gap: 150px;
+}
+
+.categorie {
+  border: 2px solid rgb(117, 91, 180);
+  color: rgb(117, 91, 180);
+  text-decoration: none;
+  padding: 5px 10px;
+}
