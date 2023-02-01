@@ -2,7 +2,17 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "@/styles/Home.module.css";
 
-export default function Home() {
+export const getStaticProps = async () => {
+  const result = await fetch("http://localhost:1337/api/categories");
+  const data = await result.json();
+
+  return {
+    props: { categories: data },
+  };
+};
+
+export default function Home({ categories }) {
+  const categoriesArr = categories.data;
   return (
     <>
       <Head>
@@ -12,12 +22,19 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.categoriesbox}>
-        <div className={styles.categorie}>
+        {categoriesArr.map((item) => {
+          return (
+            <Link key={item.id} href={`${item.attributes.name.toLowerCase()}`}>
+              {item.attributes.name}
+            </Link>
+          );
+        })}
+        {/* <div className={styles.categorie}>
           <Link href="/about">Covers</Link>
         </div>
         <div className={styles.categorie}>
           <Link href="/about">Pillows</Link>
-        </div>
+        </div> */}
       </div>
     </>
   );
