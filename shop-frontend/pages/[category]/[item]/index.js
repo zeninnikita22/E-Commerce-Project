@@ -3,3 +3,12 @@ function Item() {
 }
 
 export default Item;
+
+export const getStaticProps = async () => {
+  const result = await fetch("http://localhost:1337/api/categories/items");
+  const data = await result.json();
+
+  return {
+    props: { categories: data },
+  };
+};
