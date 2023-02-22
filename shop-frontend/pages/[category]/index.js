@@ -1,13 +1,13 @@
 function Category({ categories }) {
   const array = categories.data;
-
+  console.log(array);
   return (
     <>
       <div>xyz</div>
       {/* <div>{categories.data.attributes.name}</div> */}
-      {array.map((item) => {
+      {/* {array.map((item) => {
         return <div>{item.attributes.name}</div>;
-      })}
+      })} */}
     </>
   );
 
@@ -16,10 +16,13 @@ function Category({ categories }) {
 
 export default Category;
 
-export const getStaticProps = async () => {
-  const result = await fetch("http://localhost:1337/api/categories");
+export const getStaticProps = async ({ params }) => {
+  const { category } = params;
+  const result = await fetch(
+    `http://localhost:1337/api/categories/${category}?populate=*`
+  );
   const data = await result.json();
-
+  console.log("abc", data);
   return {
     props: { categories: data },
   };
