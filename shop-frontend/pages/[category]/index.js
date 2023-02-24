@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function Category({ categories }) {
   const array = categories.data;
   console.log(array);
@@ -6,7 +8,12 @@ function Category({ categories }) {
       <div>xyz</div>
       <div>{array[0].attributes.name}</div>
       {array[0].attributes.items.data.map((item) => {
-        return <div>{item.attributes.Title}</div>;
+        return (
+          <Link key={item.id} href={`${item.id}`}>
+            {item.attributes.Title}
+          </Link>
+          // need to figure out which dynamic href to put here
+        );
       })}
     </>
   );
@@ -36,7 +43,7 @@ export const getStaticPaths = async () => {
   console.log("data in getStaticPaths [category]", data);
   const paths = data.data.map((item) => {
     return {
-      params: { category: item.attributes.name }, // :D hz
+      params: { category: item.attributes.name },
     };
   });
   console.log(123);
