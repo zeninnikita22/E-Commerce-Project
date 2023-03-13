@@ -9,9 +9,10 @@ function Category({ categories }) {
       <div>{array[0].attributes.name}</div>
       {array[0].attributes.items.data.map((item) => {
         return (
-          <Link key={item.id} href={`${item.id}`}>
+          <Link key={item.id} href={`/${array[0].attributes.name}/${item.id}`}>
             {item.attributes.Title}
           </Link>
+          // <div>{item.attributes.Title}</div>
           // need to figure out which dynamic href to put here
         );
       })}
@@ -26,7 +27,7 @@ export default Category;
 export const getStaticProps = async (context) => {
   const category = context.params.category;
 
-  console.log("category", { category });
+  console.log(context);
   const result = await fetch(
     `http://localhost:1337/api/categories?filters[name][$eq]=${category}&populate=*`
   );
