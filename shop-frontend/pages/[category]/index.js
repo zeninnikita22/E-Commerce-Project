@@ -12,14 +12,10 @@ function Category({ categories }) {
           <Link key={item.id} href={`/${array[0].attributes.name}/${item.id}`}>
             {item.attributes.Title}
           </Link>
-          // <div>{item.attributes.Title}</div>
-          // need to figure out which dynamic href to put here
         );
       })}
     </>
   );
-
-  // return <div>123</div>;
 }
 
 export default Category;
@@ -53,9 +49,3 @@ export const getStaticPaths = async () => {
     fallback: false,
   };
 };
-
-// `http://localhost:1337/api/categories/2?populate=*`
-// http://localhost:1337/api/categories/?populate=*
-
-// fetch in strapi by something other than id
-// http://localhost:1337/api/posts?filters[slug][$eq]=entrada-de-prueba-2
