@@ -2,13 +2,21 @@
   display: flex;
   overflow: hidden;
   align-items: center;
+  justify-content: space-between;
   color: rgb(117, 91, 180);
-  gap: 50px;
+  padding: 10px 50px;
 }
 
 .navbarlink {
   text-decoration: none;
   color: rgb(117, 91, 180);
+}
+
+.navbaritems {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 50px;
 }
 
 .arrowdown {
@@ -17,6 +25,8 @@
 }
 
 .shopdropdown {
+  display: flex;
+  flex-direction: row;
 }
 
 .shopdropdown .shopdropdown__button {
@@ -24,7 +34,6 @@
   border: none;
   outline: none;
   color: rgb(117, 91, 180);
-  padding: 14px 16px;
   background-color: inherit;
   font-family: inherit;
   margin: 0;
