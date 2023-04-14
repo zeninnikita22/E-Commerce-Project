@@ -17,6 +17,8 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@next/font": "13.1.6",
+    "@tanstack/react-query": "^4.29.1",
+    "@tanstack/react-query-devtools": "^4.29.1",
     "framer-motion": "^10.8.4",
     "next": "13.1.6",
     "react": "18.2.0",
