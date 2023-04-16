@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { resolve } from "styled-jsx/css";
 
 function About() {
   const categoryQuery = useQuery({
@@ -12,9 +13,27 @@ function About() {
         }),
   });
 
+  if (categoryQuery.isLoading) return <h2>Loading!</h2>;
+  if (categoryQuery.isError) return <h2>Error!</h2>;
+
   console.log(categoryQuery);
 
-  return <div>Temporary page for requests</div>;
+  return (
+    <>
+      <div>Temporary page for requests</div>
+      <div>
+        {categoryQuery.isSuccess
+          ? categoryQuery.data.map((e) => {
+              return <div>{e.attributes.name}</div>;
+            })
+          : null}
+      </div>
+    </>
+  );
+
+  // function delay(miliseconds) {
+  //   return new Promise((resolve) => setTimeout(resolve, miliseconds));
+  // }
 }
 
 export default About;
