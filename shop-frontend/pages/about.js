@@ -2,15 +2,16 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { resolve } from "styled-jsx/css";
 
 function About() {
+  const axios = require("axios");
   const categoryQuery = useQuery({
     queryKey: ["categories"],
     queryFn: () =>
-      fetch("http://localhost:1337/api/categories/")
-        .then((response) => response.json())
-        .then(({ data }) => {
+      axios.get("http://localhost:1337/api/categories/").then(
+        ({ data }) => {
           return data;
-          // console.log(data);
-        }),
+        }
+        // console.log(data);
+      ),
   });
 
   if (categoryQuery.isLoading) return <h2>Loading!</h2>;
@@ -18,12 +19,14 @@ function About() {
 
   console.log(categoryQuery);
 
+  const dataOfCategoryQuery = categoryQuery.data;
+
   return (
     <>
       <div>Temporary page for requests</div>
       <div>
         {categoryQuery.isSuccess
-          ? categoryQuery.data.map((e) => {
+          ? dataOfCategoryQuery.data.map((e) => {
               return <div>{e.attributes.name}</div>;
             })
           : null}
