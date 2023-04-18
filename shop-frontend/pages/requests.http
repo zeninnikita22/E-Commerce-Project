@@ -1,0 +1,8 @@
+POST http://localhost:1337/api/categories/
+Content-Type: application/json
+
+{
+  "data": {
+    "name": "Hello",
+    }
+  }
