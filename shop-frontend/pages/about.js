@@ -4,7 +4,8 @@ import { useState } from "react";
 
 function About() {
   const [categoryName, setCategoryName] = useState("");
-  // const [deleteCategoryId, setDeleteCategoryId] = useState();
+  const [updateCategoryId, setUpdateCategoryId] = useState("");
+  const [selectedUpdateIds, setSelectedUpdateIds] = useState([]);
   const queryClient = useQueryClient();
 
   const axios = require("axios");
@@ -72,6 +73,32 @@ function About() {
     });
   }
 
+  function handleClick(e) {
+    const idExists = selectedUpdateIds.includes(e.id);
+
+    if (idExists) {
+      const filteredIds = selectedUpdateIds.filter(
+        (selectedUpdateId) => selectedUpdateId !== e.id
+      );
+      setSelectedUpdateIds(filteredIds);
+    } else {
+      setSelectedUpdateIds([...selectedUpdateIds, e.id]);
+    }
+  }
+
+  function UpdateInput() {
+    return (
+      <div>
+        <input type="text" placeholder="update the name"></input>
+        <button>Update</button>
+      </div>
+    );
+  }
+
+  // function openSection() {
+  //   setUpdateSectionToggled(!updateSectionToggled);
+  // }
+
   // const handleCreatePost = (event) => {
   //   event.preventDefault();
   //   const newPost = {
@@ -109,6 +136,8 @@ function About() {
                   <div>{e.attributes.name}</div>
                   <div>
                     <button onClick={() => deleteCategory(e)}>Delete</button>
+                    <button onClick={() => handleClick(e)}>Update name</button>
+                    {selectedUpdateIds.includes(e.id) ? <UpdateInput /> : null}
                   </div>
                 </div>
               );
