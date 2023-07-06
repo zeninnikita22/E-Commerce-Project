@@ -4,7 +4,7 @@ import { useState } from "react";
 
 function About() {
   const [categoryName, setCategoryName] = useState("");
-  const [updatedCategoryName, setUpdatedCategoryName] = useState("");
+  // const [updatedCategoryName, setUpdatedCategoryName] = useState("");
   const [updateCategoryId, setUpdateCategoryId] = useState("");
   const [selectedUpdateIds, setSelectedUpdateIds] = useState([]);
   const queryClient = useQueryClient();
@@ -33,12 +33,14 @@ function About() {
         .then((response) => response.data),
   });
   const updateCategoryMutation = useMutation({
-    mutationFn: (updateCategoryId, updatedCategory) =>
+    mutationFn: ({ a, b }) =>
+      // console.log(a, b, typeof a)
       axios
-        .put(
-          `http://localhost:1337/api/categories/${updateCategoryId}`,
-          updatedCategory
-        )
+        .put(`http://localhost:1337/api/categories/${b}`, {
+          data: {
+            name: a,
+          },
+        })
         .then((response) => response.data),
   });
 
@@ -77,23 +79,29 @@ function About() {
   }
 
   function updateCategory(e) {
-    // event.preventDefault();
-    // console.log(event);
+    e.preventDefault();
+    // console.log(e);
     // console.log(updateCategoryId);
-    // setUpdateCategoryId(event.id);
-    setUpdatedCategoryName(e.target[0].value);
 
-    const updatedCategory = {
-      data: {
-        name: updatedCategoryName,
-      },
-    };
-    updateCategoryMutation.mutate(updatedCategory, {
-      onSuccess: async () => {
-        console.log("category updated!");
-        await queryClient.refetchQueries("categories");
-      },
-    });
+    // console.log(event);
+    // console.log(updateCategoryId );
+    // setUpdateCategoryId(event.id);
+    // setUpdatedCategoryName(e.target[0].value);
+    // setUpdatedCategoryName({
+    //   data: {
+    //     name: e.target[0].value,
+    //   },
+    // });
+
+    updateCategoryMutation.mutate(
+      { a: e.target[0].value, b: updateCategoryId },
+      {
+        onSuccess: async () => {
+          console.log("category updated!");
+          await queryClient.refetchQueries("categories");
+        },
+      }
+    );
   }
 
   function handleClick(e) {
@@ -110,15 +118,15 @@ function About() {
     }
   }
 
-  function UpdateInput(e) {
+  function UpdateInput() {
     return (
       <div>
         <form onSubmit={updateCategory}>
           <input
             type="text"
-            placeholder="update the name"
-            value={updatedCategoryName}
-            onChange={(e) => setUpdatedCategoryName(e.target.value)}
+            // placeholder="update the name"
+            // value={updatedCategoryName}
+            // onChange={() => setUpdatedCategoryName(e.target.value)}
           ></input>
           <button type="submit">Update</button>
         </form>
@@ -168,9 +176,7 @@ function About() {
                   <div>
                     <button onClick={() => deleteCategory(e)}>Delete</button>
                     <button onClick={() => handleClick(e)}>Update name</button>
-                    {selectedUpdateIds.includes(e.id) ? (
-                      <UpdateInput e={e} />
-                    ) : null}
+                    {selectedUpdateIds.includes(e.id) ? <UpdateInput /> : null}
                   </div>
                 </div>
               );
