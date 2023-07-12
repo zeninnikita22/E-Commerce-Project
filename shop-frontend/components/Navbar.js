@@ -34,6 +34,7 @@ function Navbar() {
         <Link href="/contacts" className={styles.navbarlink}>
           Contacts
         </Link>
+        <div>CART</div>
       </div>
     </div>
   );

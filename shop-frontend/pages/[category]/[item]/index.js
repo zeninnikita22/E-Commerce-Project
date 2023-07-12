@@ -1,4 +1,8 @@
+import { addToCart } from "@/pages/redux/cartReducer";
+import { useDispatch } from "react-redux";
+
 function Item({ items }) {
+  const dispatch = useDispatch();
   const array = items.data;
   console.log(array);
   return (
@@ -7,7 +11,10 @@ function Item({ items }) {
       <div>
         Description: {array[0].attributes.items.data[0].attributes.Description}
       </div>
-      <div>Price: {array[0].attributes.items.data[0].attributes.Price}USD</div>
+      <div>Price: {array[0].attributes.items.data[0].attributes.Price}USD?</div>
+      <button>+</button>
+      <button>-</button>
+      <button onClick={() => dispatch(addToCart())}>Add to cart</button>
     </div>
   );
 }

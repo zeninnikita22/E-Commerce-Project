@@ -40,7 +40,9 @@ export const getStaticPaths = async () => {
   console.log("data in getStaticPaths [category]", data);
   const paths = data.data.map((item) => {
     return {
-      params: { category: item.attributes.name },
+      params: {
+        category: item.attributes.name,
+      },
     };
   });
   console.log(123);

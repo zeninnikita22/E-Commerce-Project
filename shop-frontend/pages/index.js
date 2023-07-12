@@ -24,7 +24,7 @@ export default function Home({ categories }) {
       <div className={styles.categoriesbox}>
         {categoriesArr.map((item) => {
           return (
-            <Link key={item.id} href={`${item.attributes.name.toLowerCase()}`}>
+            <Link key={item.id} href={`${item.attributes.name}`}>
               {item.attributes.name}
             </Link>
           );
