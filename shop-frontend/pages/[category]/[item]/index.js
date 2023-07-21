@@ -7,6 +7,12 @@ function Item({ items }) {
   console.log(array);
   return (
     <div>
+      <p>
+        {array[0].attributes.name.charAt(0).toUpperCase() +
+          array[0].attributes.name.slice(1)}{" "}
+        &gt;
+      </p>
+      <p>{array[0].attributes.items.data[0].attributes.Title}</p>
       <div>Title: {array[0].attributes.items.data[0].attributes.Title}</div>
       <div>
         Description: {array[0].attributes.items.data[0].attributes.Description}
