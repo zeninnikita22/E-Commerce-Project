@@ -4,6 +4,9 @@ import { useState } from "react";
 import { trpc } from "./utils/trpc";
 
 export default function Home() {
+  const itemsQuery = trpc.getAllItems.useQuery();
+  console.log(itemsQuery.data);
+
   return (
     <>
       <p>Home</p>

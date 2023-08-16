@@ -2,9 +2,13 @@ import * as trpcNext from "@trpc/server/adapters/next";
 import { publicProcedure, router } from "../../../server/trpc";
 import { z } from "zod";
 // import axios from "axios";
-// import prisma from "../../../../lib/prisma";
+import prisma from "../../../../lib/prisma";
 
 const appRouter = router({
+  getAllItems: publicProcedure.query(async () => {
+    const data = await prisma.item.findMany();
+    return data;
+  }),
   // //   greeting: publicProcedure
   // //     // This is the input schema of your procedure
   // //     // 💡 Tip: Try changing this and see type errors on the client straight away
