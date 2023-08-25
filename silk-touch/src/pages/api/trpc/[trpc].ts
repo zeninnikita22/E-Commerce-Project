@@ -67,24 +67,31 @@ const appRouter = router({
   //       //   // .post(`http://localhost:1337/api/categories/`, input.name)
   //       //   .then((response) => response.data);
   //     // }),
-  //   addUser: publicProcedure
-  //     .input(z.object({ name: z.string(), email: z.string().email() }))
-  //     .mutation(async ({ input }) => {
-  //       try {
-  //         await prisma.user.create({
-  //           data: {
-  //             name: input.name,
-  //             email: input.email,
-  //           },
-  //         });
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //       // await axios
-  //       //   .post(`http://localhost:1337/api/categories/`, "hui")
-  //       //   // .post(`http://localhost:1337/api/categories/`, input.name)
-  //       //   .then((response) => response.data);
-  //     }),
+  registerUser: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await prisma.user.create({
+          data: {
+            name: input.name,
+            email: input.email,
+            password: input.password,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+      // await axios
+      //   .post(`http://localhost:1337/api/categories/`, "hui")
+      //   // .post(`http://localhost:1337/api/categories/`, input.name)
+      //   .then((response) => response.data);
+    }),
   //   deleteUser: publicProcedure
   //     .input(z.object({ email: z.string().email() }))
   //     .mutation(async ({ input }) => {
