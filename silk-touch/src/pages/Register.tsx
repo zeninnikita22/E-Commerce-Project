@@ -103,7 +103,9 @@ export default function Register() {
               value={formData.confirmPassword}
               onChange={handleChange}
             />
-            {errors.confirmPassword && <span>{errors.confirmPassword}</span>}
+            {errors.confirmPassword && (
+              <span key={errors.name}>{errors.confirmPassword}</span>
+            )}
           </div>
           <button type="submit">Register</button>
         </form>

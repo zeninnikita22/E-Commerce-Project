@@ -87,10 +87,29 @@ const appRouter = router({
       } catch (error) {
         console.log(error);
       }
-      // await axios
-      //   .post(`http://localhost:1337/api/categories/`, "hui")
-      //   // .post(`http://localhost:1337/api/categories/`, input.name)
-      //   .then((response) => response.data);
+    }),
+  loginUser: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await prisma.user.findUnique({
+        where: { email: input.email },
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      if (input.password === user.password) {
+        return { isAuthorized: true };
+        // console.log("authentication successful");
+      } else {
+        throw new Error("Invalid password");
+      }
     }),
   //   deleteUser: publicProcedure
   //     .input(z.object({ email: z.string().email() }))
