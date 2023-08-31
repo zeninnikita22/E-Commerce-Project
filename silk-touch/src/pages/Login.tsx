@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { trpc } from "./utils/trpc";
+import bcrypt from "bcryptjs";
 
 const Login = ({ isLoggedIn, setIsLoggedIn }) => {
   const loginUserMutation = trpc.loginUser.useMutation();
@@ -23,9 +24,12 @@ const Login = ({ isLoggedIn, setIsLoggedIn }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     console.log("Login data submitted:", formData);
+
+    // const passwordMatch = await bcrypt.compare(formData.password, user.hashedPassword);
+
     loginUserMutation.mutate(
       {
         email: `${formData.email}`,
@@ -43,7 +47,7 @@ const Login = ({ isLoggedIn, setIsLoggedIn }) => {
   return (
     <div>
       <h2>Login Form</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <div>
           <label>Email:</label>
           <input

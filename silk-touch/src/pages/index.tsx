@@ -11,7 +11,9 @@ export default function Home() {
 
   return (
     <>
-      {isLoggedIn ? <Dashboard /> : null}
+      {isLoggedIn ? (
+        <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      ) : null}
       <Login isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       <Register />
       <p>Home</p>

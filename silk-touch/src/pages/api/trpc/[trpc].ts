@@ -3,6 +3,7 @@ import { publicProcedure, router } from "../../../server/trpc";
 import { z } from "zod";
 // import axios from "axios";
 import prisma from "../../../../lib/prisma";
+import bcrypt from "bcryptjs";
 
 const appRouter = router({
   getAllItems: publicProcedure.query(async () => {
@@ -81,7 +82,7 @@ const appRouter = router({
           data: {
             name: input.name,
             email: input.email,
-            password: input.password,
+            hashedPassword: input.password,
           },
         });
       } catch (error) {
@@ -104,7 +105,12 @@ const appRouter = router({
         throw new Error("User not found");
       }
 
-      if (input.password === user.password) {
+      const passwordMatch = await bcrypt.compare(
+        input.password,
+        user.hashedPassword
+      );
+
+      if (passwordMatch) {
         return { isAuthorized: true };
         // console.log("authentication successful");
       } else {

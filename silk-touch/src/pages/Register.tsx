@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { trpc } from "./utils/trpc";
+import bcrypt from "bcryptjs";
 
 export default function Register() {
   const registerUserMutation = trpc.registerUser.useMutation();
@@ -21,8 +22,10 @@ export default function Register() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const hashedPassword = await bcrypt.hash(formData.password, 10);
 
     const newErrors = {};
 
@@ -50,11 +53,11 @@ export default function Register() {
 
     if (Object.keys(newErrors).length === 0) {
       // Submit the form or perform other actions
-      console.log("Form submitted successfully", formData);
+      console.log("Form submitted successfully", formData, hashedPassword);
       registerUserMutation.mutate({
         email: `${formData.email}`,
         name: `${formData.name}`,
-        password: `${formData.password}`,
+        password: `${hashedPassword}`,
       });
     }
   };
