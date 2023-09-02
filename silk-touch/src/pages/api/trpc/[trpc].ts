@@ -111,7 +111,12 @@ const appRouter = router({
       );
 
       if (passwordMatch) {
-        return { isAuthorized: true };
+        return {
+          isAuthorized: true,
+          name: user.name,
+          email: user.email,
+          id: user.id,
+        };
         // console.log("authentication successful");
       } else {
         throw new Error("Invalid password");

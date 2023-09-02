@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { trpc } from "./utils/trpc";
 import bcrypt from "bcryptjs";
 
-const Login = ({ isLoggedIn, setIsLoggedIn }) => {
+const Login = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  loggedInName,
+  setLoggedInName,
+}) => {
   const loginUserMutation = trpc.loginUser.useMutation();
 
   // if (loginUserMutation.data?.isAuthorized === true) {
@@ -24,7 +29,7 @@ const Login = ({ isLoggedIn, setIsLoggedIn }) => {
     }));
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     console.log("Login data submitted:", formData);
 
@@ -37,11 +42,15 @@ const Login = ({ isLoggedIn, setIsLoggedIn }) => {
       },
       {
         onSuccess(data, variables, context) {
+          console.log("OnSuccess data received", data);
           setIsLoggedIn(data.isAuthorized);
+          setLoggedInName(data.name);
+          localStorage.setItem("loggedUser", JSON.stringify(data));
         },
       }
     );
-    console.log(loginUserMutation.data?.isAuthorized);
+
+    // console.log(loginUserMutation.data?.isAuthorized);
   };
 
   return (
