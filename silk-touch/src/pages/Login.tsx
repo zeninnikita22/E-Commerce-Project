@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { trpc } from "./utils/trpc";
 import bcrypt from "bcryptjs";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Login = ({
   isLoggedIn,
   setIsLoggedIn,
   loggedInName,
   setLoggedInName,
+  numberOfCartItems,
+  setNumberOfCartItems,
 }) => {
   const loginUserMutation = trpc.loginUser.useMutation();
-
+  const queryClient = useQueryClient();
   // if (loginUserMutation.data?.isAuthorized === true) {
   //   setIsLoggedIn(true);
   // }
@@ -42,9 +45,12 @@ const Login = ({
       },
       {
         onSuccess(data, variables, context) {
+          queryClient.invalidateQueries({ queryKey: ["loginUser"] });
           console.log("OnSuccess data received", data);
+
           setIsLoggedIn(data.isAuthorized);
           setLoggedInName(data.name);
+          setNumberOfCartItems(data.cartItems.length);
           localStorage.setItem("loggedUser", JSON.stringify(data));
         },
       }

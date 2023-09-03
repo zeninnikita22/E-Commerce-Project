@@ -99,6 +99,7 @@ const appRouter = router({
     .mutation(async ({ input }) => {
       const user = await prisma.user.findUnique({
         where: { email: input.email },
+        include: { cartitems: true },
       });
 
       if (!user) {
@@ -116,10 +117,60 @@ const appRouter = router({
           name: user.name,
           email: user.email,
           id: user.id,
+          cartItems: user.cartitems,
         };
         // console.log("authentication successful");
       } else {
         throw new Error("Invalid password");
+      }
+    }),
+  addCartItem: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        itemId: z.number(), /// number or string?
+      })
+    )
+    .mutation(async ({ input }) => {
+      // const cartItems = await prisma.user.findUnique({
+      //   where: { email: input.email },
+      // });
+      // return cartItems;
+      try {
+        // Find the user by their ID
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          const item = await prisma.item.findUnique({
+            where: { id: input.itemId },
+          });
+
+          if (!item) {
+            throw new Error("Item doesn't exist");
+          } else {
+            const newItem = await prisma.cartItem.create({
+              data: {
+                title: item.title,
+                content: item.content,
+                author: {
+                  connect: { id: user.id }, // Connect to the user
+                },
+              },
+            });
+            const cartItems = user.cartitems;
+            console.log("Item added to cart:", newItem);
+            return cartItems;
+          }
+
+          // Create a new cart item and associate it with the user
+        }
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
       }
     }),
   //   deleteUser: publicProcedure
@@ -175,7 +226,6 @@ const appRouter = router({
   //   //   return data;
   //   // }),
 });
-
 // const newCategoryMutation = useMutation({
 //   mutationFn: (newCategory) =>
 //     axios
