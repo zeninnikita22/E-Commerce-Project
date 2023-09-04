@@ -3,6 +3,11 @@ import { trpc } from "./utils/trpc";
 import { useState, useEffect } from "react";
 
 const CartIcon = ({ loggedInUserId, numberOfCartItems }) => {
+  const cartQuery = trpc.getCartItems.useQuery({
+    userId: loggedInUserId,
+  });
+
+  console.log("cart", cartQuery.data);
   //   const getUserCartItemCountMutation = trpc.getUserCartItemCount.useMutation();
   //   const [numberOfCartItems, setNumberOfCartItems] = useState(0);
 
@@ -22,7 +27,7 @@ const CartIcon = ({ loggedInUserId, numberOfCartItems }) => {
 
   return (
     <>
-      <div>NUMBER {numberOfCartItems + 1}</div>
+      <div>NUMBER {cartQuery.data?.length}</div>
     </>
   );
 };

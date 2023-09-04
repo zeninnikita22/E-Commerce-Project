@@ -10,6 +10,8 @@ const Login = ({
   setLoggedInName,
   numberOfCartItems,
   setNumberOfCartItems,
+  setCartItems,
+  cartItems,
 }) => {
   const loginUserMutation = trpc.loginUser.useMutation();
   const queryClient = useQueryClient();
@@ -51,6 +53,7 @@ const Login = ({
           setIsLoggedIn(data.isAuthorized);
           setLoggedInName(data.name);
           setNumberOfCartItems(data.cartItems.length);
+          setCartItems(data.cartItems);
           localStorage.setItem("loggedUser", JSON.stringify(data));
         },
       }

@@ -11,11 +11,18 @@ export default function Home() {
   const [loggedInName, setLoggedInName] = useState("");
   const [loggedInUserId, setLoggedInUserId] = useState(0);
   const [numberOfCartItems, setNumberOfCartItems] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   console.log(itemsQuery.data);
 
   const queryClient = useQueryClient();
+
+  const cartQuery = trpc.getCartItems.useQuery({
+    userId: loggedInUserId,
+  });
+
+  console.log("cart", cartQuery.data);
 
   useEffect(() => {
     console.log("Local storage data is:", localStorage.getItem("loggedUser"));
@@ -44,9 +51,7 @@ export default function Home() {
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["addCartItem"] });
-          console.log(data);
-          setNumberOfCartItems(data?.length);
+          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
         },
       }
     );
@@ -62,6 +67,8 @@ export default function Home() {
           setLoggedInName={setLoggedInName}
           loggedInUserId={loggedInUserId}
           numberOfCartItems={numberOfCartItems}
+          cartItems={cartItems}
+          setCartItems={setCartItems}
         />
       ) : null}
       <Login
@@ -71,6 +78,8 @@ export default function Home() {
         setLoggedInName={setLoggedInName}
         numberOfCartItems={numberOfCartItems}
         setNumberOfCartItems={setNumberOfCartItems}
+        cartItems={cartItems}
+        setCartItems={setCartItems}
       />
       <Register />
       <p>Home</p>
