@@ -1,6 +1,7 @@
 import React from "react";
 import CartIcon from "./CartIcon";
 import { trpc } from "./utils/trpc";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Dashboard = ({
   isLoggedIn,
@@ -16,10 +17,29 @@ const Dashboard = ({
     setIsLoggedIn(false);
     localStorage.clear();
   };
-
+  const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
+  const queryClient = useQueryClient();
   const cartQuery = trpc.getCartItems.useQuery({
     userId: loggedInUserId,
   });
+
+  function deleteFromCart(item) {
+    console.log(item);
+    /// you are calling it on Click only, right? how about call it on login too?
+    deleteItemFromCartMutation.mutate(
+      {
+        userId: loggedInUserId,
+        itemId: item.id,
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["deleteCartItem"] });
+          console.log("Deleted item", data);
+        },
+      }
+    );
+  }
 
   return (
     <>
@@ -27,7 +47,13 @@ const Dashboard = ({
       <h1>Cart Items:</h1>
       <div>
         {cartQuery.data?.map((item) => {
-          return item.title;
+          return (
+            <>
+              <button>+</button>
+              <div>{item.title}</div>
+              <button onClick={() => deleteFromCart(item)}>-</button>
+            </>
+          );
         })}
       </div>
       <div>

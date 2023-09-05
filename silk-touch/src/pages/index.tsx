@@ -14,6 +14,7 @@ export default function Home() {
   const [cartItems, setCartItems] = useState([]);
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
+  const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   console.log(itemsQuery.data);
 
   const queryClient = useQueryClient();
@@ -52,6 +53,24 @@ export default function Home() {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+          console.log(data);
+        },
+      }
+    );
+  }
+
+  function deleteFromCart(item) {
+    /// you are calling it on Click only, right? how about call it on login too?
+    deleteItemFromCartMutation.mutate(
+      {
+        userId: loggedInUserId,
+        itemId: item.id,
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+          console.log("Deleted item", data);
         },
       }
     );

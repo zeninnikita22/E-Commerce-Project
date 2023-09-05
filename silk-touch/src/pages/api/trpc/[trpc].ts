@@ -173,6 +173,44 @@ const appRouter = router({
         console.error("Error adding item to cart:", error);
       }
     }),
+  deleteCartItem: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        itemId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // const cartItems = await prisma.user.findUnique({
+      //   where: { email: input.email },
+      // });
+      // return cartItems;
+      try {
+        // Find the user by their ID
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          const item = await prisma.cartItem.delete({
+            where: { id: input.itemId },
+          });
+
+          if (!item) {
+            throw new Error("Item doesn't exist");
+          } else {
+            return user.cartitems;
+          }
+
+          // Create a new cart item and associate it with the user
+        }
+      } catch (error) {
+        console.error("Error deleting item from cart:", error);
+      }
+    }),
   getCartItems: publicProcedure
     .input(
       z.object({
