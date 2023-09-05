@@ -43,7 +43,7 @@ export default function Home() {
   }, []);
 
   function addToCart(item) {
-    /// you are calling it on Click only, right? how about call it on login too?
+    console.log(loggedInUserId);
     addItemToCartMutation.mutate(
       {
         userId: loggedInUserId,
@@ -53,7 +53,7 @@ export default function Home() {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log(data);
+          console.log("Add to cart OnSuccess", data);
         },
       }
     );

@@ -10,64 +10,6 @@ const appRouter = router({
     const data = await prisma.item.findMany();
     return data;
   }),
-  // //   greeting: publicProcedure
-  // //     // This is the input schema of your procedure
-  // //     // 💡 Tip: Try changing this and see type errors on the client straight away
-  // //     .input(
-  // //       z.object({
-  // //         name: z.string().nullish(),
-  // //         age: z.number(),
-  // //       })
-  // //     )
-  // //     .query(({ input }) => {
-  // //       // This is what you're returning to your client
-  // //       return {
-  // //         text: `hello ${input?.name ?? "world"}`,
-  // //         // 💡 Tip: Try adding a new property here and see it propagate to the client straight-away
-  // //       };
-  // //     }),
-  // //   // 💡 Tip: Try adding a new procedure here and see if you can use it in the client!
-  // //   getUser: publicProcedure.query(() => {
-  // //     return { id: "1", name: "bob" };
-  // //   }),
-  // //   getData: publicProcedure
-  // //     .input(z.object({ id: z.string() }))
-  // //     .query(async ({ input }) => {
-  // //       console.log("Input id", input.id);
-  // //       const response = await fetch(
-  // //         `https://jsonplaceholder.typicode.com/posts/${input.id}`
-  // //       );
-  // //       const data = await response.json();
-  // //       // console.log("Called in server", data);
-  // //       return data;
-  // //     }),
-  // //   getCategories: publicProcedure.query(async () => {
-  // //     const response = await fetch("http://localhost:1337/api/categories/");
-  // //     const data = await response.json();
-  // //     // console.log("Called in server", data);
-  // //     return data;
-  // //   }),
-  // //   addCategory: publicProcedure
-  // //     .input(z.object({ name: z.string() }))
-  // //     .mutation(async ({ input }) => {
-  // //       try {
-  // //         console.log({ input });
-  // //         const result = await axios.post(
-  // //           "http://localhost:1337/api/categories/",
-  // //           {
-  // //             data: {
-  // //               name: input.name,
-  // //             },
-  // //           }
-  // //         );
-  // //       } catch (error) {
-  // //         console.log(error);
-  // //       }
-  //       // await axios
-  //       //   .post(`http://localhost:1337/api/categories/`, "hui")
-  //       //   // .post(`http://localhost:1337/api/categories/`, input.name)
-  //       //   .then((response) => response.data);
-  //     // }),
   registerUser: publicProcedure
     .input(
       z.object({
@@ -119,7 +61,6 @@ const appRouter = router({
           id: user.id,
           cartItems: user.cartitems,
         };
-        // console.log("authentication successful");
       } else {
         throw new Error("Invalid password");
       }
@@ -128,51 +69,114 @@ const appRouter = router({
     .input(
       z.object({
         userId: z.number(),
-        itemId: z.number(), /// number or string?
+        itemId: z.number(),
       })
     )
-    .mutation(async ({ input }) => {
-      // const cartItems = await prisma.user.findUnique({
-      //   where: { email: input.email },
-      // });
-      // return cartItems;
-      try {
-        // Find the user by their ID
-        const user = await prisma.user.findUnique({
-          where: { id: input.userId },
-          include: { cartitems: true },
-        });
+    .mutation(
+      async ({ input }) => {
+        try {
+          // Find the user
+          const user = await prisma.user.findUnique({
+            where: { id: input.userId },
+            include: { cartitems: true },
+          });
 
-        if (!user) {
-          throw new Error("User not found");
-        } else {
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          // Find the item
           const item = await prisma.item.findUnique({
             where: { id: input.itemId },
           });
 
           if (!item) {
-            throw new Error("Item doesn't exist");
+            throw new Error("Item not found");
+          }
+
+          // Check if the item is already in the cart
+          const existingCartItem = user.cartitems.find(
+            (cartItem) => cartItem.itemId === input.itemId
+          );
+
+          if (existingCartItem) {
+            // If the item already exists, increment its quantity
+            await prisma.cartItem.update({
+              where: { id: existingCartItem.id },
+              data: { quantity: existingCartItem.quantity + 1 },
+            });
           } else {
-            const newItem = await prisma.cartItem.create({
+            // If the item doesn't exist, create a new cart item
+            await prisma.cartItem.create({
               data: {
                 title: item.title,
                 content: item.content,
-                author: {
-                  connect: { id: user.id }, // Connect to the user
-                },
+                price: item.price,
+                published: item.published,
+                author: { connect: { id: input.userId } },
+                item: { connect: { id: input.itemId } },
+                quantity: 1,
               },
             });
-            const cartItems = user.cartitems;
-            console.log("Item added to cart:", newItem);
-            return cartItems;
           }
 
-          // Create a new cart item and associate it with the user
+          console.log("Item added to cart");
+        } catch (error) {
+          console.error("Error adding item to cart:", error);
         }
-      } catch (error) {
-        console.error("Error adding item to cart:", error);
       }
-    }),
+      // try {
+      //   // Find the user by their ID
+      //   console.log(input);
+      //   const user = await prisma.user.findUnique({
+      //     where: { id: input.userId },
+      //     include: { cartitems: true },
+      //   });
+
+      //   if (!user) {
+      //     throw new Error("User not found");
+      //   } else {
+      //     const item = await prisma.item.findUnique({
+      //       where: { id: input.itemId },
+      //     });
+
+      //     if (!item) {
+      //       throw new Error("Item doesn't exist");
+      //     } else {
+      //       const cartItem = await prisma.cartItem.findUnique({
+      //         where: { itemId: input.itemId, authorId: input.userId },
+      //       });
+      //       if (!cartItem) {
+      //         const newItem = await prisma.cartItem.create({
+      //           data: {
+      //             title: item.title,
+      //             content: item.content,
+      //             price: item.price,
+      //             author: {
+      //               connect: { id: user.id }, // Connect to the user
+      //             },
+      //             item: { connect: { id: item.id } },
+      //           },
+      //         });
+      //         const cartItems = user.cartitems;
+      //         console.log("Item added to cart:", newItem);
+      //         return cartItems;
+      //       } else {
+      //         const updatedCartItem = await prisma.cartItem.update({
+      //           where: { authorId: input.userId, itemId: input.itemId },
+      //           data: {
+      //             quantity:
+      //           }
+      //         });
+      //       }
+      //     }
+
+      //     // Create a new cart item and associate it with the user
+      //   }
+      // } catch (error) {
+      //   console.error("Error adding item to cart:", error);
+      // }
+    ),
   deleteCartItem: publicProcedure
     .input(
       z.object({
@@ -180,37 +184,80 @@ const appRouter = router({
         itemId: z.number(),
       })
     )
-    .mutation(async ({ input }) => {
-      // const cartItems = await prisma.user.findUnique({
-      //   where: { email: input.email },
-      // });
-      // return cartItems;
-      try {
-        // Find the user by their ID
-        const user = await prisma.user.findUnique({
-          where: { id: input.userId },
-          include: { cartitems: true },
-        });
+    .mutation(
+      async ({ input }) => {
+        try {
+          // Find the user
+          console.log(input);
+          const user = await prisma.user.findUnique({
+            where: { id: input.userId },
+            include: { cartitems: true },
+          });
 
-        if (!user) {
-          throw new Error("User not found");
-        } else {
-          const item = await prisma.cartItem.delete({
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          // Find the item
+          const item = await prisma.item.findUnique({
             where: { id: input.itemId },
           });
 
           if (!item) {
-            throw new Error("Item doesn't exist");
-          } else {
-            return user.cartitems;
+            throw new Error("Item not found");
           }
 
-          // Create a new cart item and associate it with the user
+          // Check if the item is in the cart
+          const existingCartItem = user.cartitems.find(
+            (cartItem) => cartItem.itemId === input.itemId
+          );
+
+          if (existingCartItem) {
+            if (existingCartItem.quantity > 1) {
+              // If quantity > 1, decrement the quantity
+              await prisma.cartItem.update({
+                where: { id: existingCartItem.id },
+                data: { quantity: existingCartItem.quantity - 1 },
+              });
+            } else {
+              // If quantity is 1, remove the cart item
+              await prisma.cartItem.delete({
+                where: { id: existingCartItem.id },
+              });
+            }
+          }
+
+          console.log("Item deleted from cart");
+        } catch (error) {
+          console.error("Error deleting item from cart:", error);
         }
-      } catch (error) {
-        console.error("Error deleting item from cart:", error);
       }
-    }),
+      // try {
+      //   // Find the user by their ID
+      //   const user = await prisma.user.findUnique({
+      //     where: { id: input.userId },
+      //     include: { cartitems: true },
+      //   });
+
+      //   if (!user) {
+      //     throw new Error("User not found");
+      //   } else {
+      //     const item = await prisma.cartItem.delete({
+      //       where: { id: input.itemId },
+      //     });
+
+      //     if (!item) {
+      //       throw new Error("Item doesn't exist");
+      //     } else {
+      //       return user.cartitems;
+      //     }
+
+      //     // Create a new cart item and associate it with the user
+      //   }
+      // } catch (error) {
+      //   console.error("Error deleting item from cart:", error);
+      // }
+    ),
   getCartItems: publicProcedure
     .input(
       z.object({
@@ -232,65 +279,7 @@ const appRouter = router({
         console.error("Error adding item to cart:", error);
       }
     }),
-  //   deleteUser: publicProcedure
-  //     .input(z.object({ email: z.string().email() }))
-  //     .mutation(async ({ input }) => {
-  //       try {
-  //         await prisma.user.update({
-  //           where: {
-  //             email: input.email,
-  //           },
-  //           data: {
-  //             posts: {
-  //               deleteMany: {},
-  //             },
-  //           },
-  //         });
-  //         await prisma.user.delete({
-  //           where: {
-  //             email: input.email,
-  //           },
-  //         });
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //     }),
-  //   getAllUsers: publicProcedure.query(async () => {
-  //     const data = await prisma.user.findMany({ include: { posts: true } });
-  //     return data;
-  //   }),
-  //   addPost: publicProcedure
-  //     .input(
-  //       z.object({ title: z.string(), content: z.string(), authorId: z.number() })
-  //     )
-  //     .mutation(async ({ input }) => {
-  //       try {
-  //         await prisma.post.create({
-  //           data: {
-  //             title: input.title,
-  //             content: input.content,
-  //             authorId: input.authorId,
-  //           },
-  //         });
-  //       } catch (error) {
-  //         console.log(error);
-  //       }
-  //       // await axios
-  //       //   .post(`http://localhost:1337/api/categories/`, "hui")
-  //       //   // .post(`http://localhost:1337/api/categories/`, input.name)
-  //       //   .then((response) => response.data);
-  //     }),
-  //   // getAllUsersPosts: publicProcedure.query(async () => {
-  //   //   const data = await prisma.user.findMany();
-  //   //   return data;
-  //   // }),
 });
-// const newCategoryMutation = useMutation({
-//   mutationFn: (newCategory) =>
-//     axios
-//       .post(`http://localhost:1337/api/categories/`, newCategory)
-//       .then((response) => response.data),
-// });
 
 // export only the type definition of the API
 // None of the actual implementation is exposed to the client

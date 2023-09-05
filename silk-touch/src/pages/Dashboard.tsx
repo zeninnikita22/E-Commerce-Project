@@ -18,24 +18,42 @@ const Dashboard = ({
     localStorage.clear();
   };
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
+  const addItemToCartMutation = trpc.addCartItem.useMutation();
   const queryClient = useQueryClient();
   const cartQuery = trpc.getCartItems.useQuery({
     userId: loggedInUserId,
   });
 
+  function addToCart(item) {
+    // console.log(loggedInUserId);
+    addItemToCartMutation.mutate(
+      {
+        userId: loggedInUserId,
+        itemId: item.itemId,
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+          console.log("Add to cart OnSuccess", data);
+        },
+      }
+    );
+  }
+
   function deleteFromCart(item) {
-    console.log(item);
+    // console.log(item);
     /// you are calling it on Click only, right? how about call it on login too?
     deleteItemFromCartMutation.mutate(
       {
         userId: loggedInUserId,
-        itemId: item.id,
+        itemId: item.itemId,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["deleteCartItem"] });
-          console.log("Deleted item", data);
+          // console.log("Deleted item", data);
         },
       }
     );
@@ -49,7 +67,7 @@ const Dashboard = ({
         {cartQuery.data?.map((item) => {
           return (
             <>
-              <button>+</button>
+              <button onClick={() => addToCart(item)}>+</button>
               <div>{item.title}</div>
               <button onClick={() => deleteFromCart(item)}>-</button>
             </>
