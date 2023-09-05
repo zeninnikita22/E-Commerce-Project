@@ -59,22 +59,22 @@ export default function Home() {
     );
   }
 
-  function deleteFromCart(item) {
-    /// you are calling it on Click only, right? how about call it on login too?
-    deleteItemFromCartMutation.mutate(
-      {
-        userId: loggedInUserId,
-        itemId: item.id,
-      },
-      {
-        onSuccess: (data) => {
-          // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Deleted item", data);
-        },
-      }
-    );
-  }
+  // function deleteFromCart(item) {
+  //   /// you are calling it on Click only, right? how about call it on login too?
+  //   deleteItemFromCartMutation.mutate(
+  //     {
+  //       userId: loggedInUserId,
+  //       itemId: item.id,
+  //     },
+  //     {
+  //       onSuccess: (data) => {
+  //         // Invalidate specific queries after the mutation is successful
+  //         queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+  //         console.log("Deleted item", data);
+  //       },
+  //     }
+  //   );
+  // }
 
   return (
     <>
