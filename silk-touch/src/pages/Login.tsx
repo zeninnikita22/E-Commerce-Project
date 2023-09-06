@@ -19,7 +19,7 @@ const Login = ({
   //   setIsLoggedIn(true);
   // }
 
-  console.log(loginUserMutation.data?.isAuthorized);
+  // console.log(loginUserMutation.data?.isAuthorized);
 
   const [formData, setFormData] = useState({
     email: "",

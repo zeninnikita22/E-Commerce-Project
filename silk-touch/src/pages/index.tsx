@@ -105,14 +105,14 @@ export default function Home() {
 
       {itemsQuery.data?.map((item) => {
         return (
-          <>
-            <div key={item.id}>
+          <div key={item.id}>
+            <div>
               <div>{item.title}</div>
               <div>{item.content}</div>
               <div>{item.id}</div>
               <button onClick={() => addToCart(item)}>Add to cart</button>
             </div>
-          </>
+          </div>
         );
       })}
     </>

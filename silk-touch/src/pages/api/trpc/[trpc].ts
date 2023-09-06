@@ -72,111 +72,178 @@ const appRouter = router({
         itemId: z.number(),
       })
     )
-    .mutation(
-      async ({ input }) => {
-        try {
-          // Find the user
-          const user = await prisma.user.findUnique({
-            where: { id: input.userId },
-            include: { cartitems: true },
+    .mutation(async ({ input }) => {
+      try {
+        console.log(input);
+        // Find the user
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
+
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is already in the cart
+        const existingCartItem = user.cartitems.find(
+          (cartItem) => cartItem.itemId === input.itemId
+        );
+
+        if (existingCartItem) {
+          // If the item already exists, increment its quantity
+          await prisma.cartItem.update({
+            where: { id: existingCartItem.id },
+            data: { quantity: existingCartItem.quantity + 1 },
           });
-
-          if (!user) {
-            throw new Error("User not found");
-          }
-
-          // Find the item
-          const item = await prisma.item.findUnique({
-            where: { id: input.itemId },
+        } else {
+          // If the item doesn't exist, create a new cart item
+          await prisma.cartItem.create({
+            data: {
+              title: item.title,
+              content: item.content,
+              price: item.price,
+              published: item.published,
+              author: { connect: { id: input.userId } },
+              item: { connect: { id: input.itemId } },
+              quantity: 1,
+            },
           });
+        }
 
-          if (!item) {
-            throw new Error("Item not found");
-          }
+        console.log("Item added to cart");
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
+      }
+    }),
+  decreaseCartItem: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        itemId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Find the user
+        console.log(input);
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
 
-          // Check if the item is already in the cart
-          const existingCartItem = user.cartitems.find(
-            (cartItem) => cartItem.itemId === input.itemId
-          );
+        if (!user) {
+          throw new Error("User not found");
+        }
 
-          if (existingCartItem) {
-            // If the item already exists, increment its quantity
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
+
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is in the cart
+        const existingCartItem = user.cartitems.find(
+          (cartItem) => cartItem.itemId === input.itemId
+        );
+
+        if (existingCartItem) {
+          if (existingCartItem.quantity > 1) {
+            // If quantity > 1, decrement the quantity
             await prisma.cartItem.update({
               where: { id: existingCartItem.id },
-              data: { quantity: existingCartItem.quantity + 1 },
+              data: { quantity: existingCartItem.quantity - 1 },
             });
           } else {
-            // If the item doesn't exist, create a new cart item
-            await prisma.cartItem.create({
-              data: {
-                title: item.title,
-                content: item.content,
-                price: item.price,
-                published: item.published,
-                author: { connect: { id: input.userId } },
-                item: { connect: { id: input.itemId } },
-                quantity: 1,
-              },
+            // If quantity is 1, remove the cart item
+            await prisma.cartItem.update({
+              where: { id: existingCartItem.id },
+              data: { quantity: 0 },
             });
           }
-
-          console.log("Item added to cart");
-        } catch (error) {
-          console.error("Error adding item to cart:", error);
         }
+
+        // console.log("Item deleted from cart");
+      } catch (error) {
+        console.error("Error decreasing number of items in cart:", error);
       }
-      // try {
-      //   // Find the user by their ID
-      //   console.log(input);
-      //   const user = await prisma.user.findUnique({
-      //     where: { id: input.userId },
-      //     include: { cartitems: true },
-      //   });
+    }),
+  updateCartItemQuantity: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        itemId: z.number(),
+        quantity: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Find the user
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
 
-      //   if (!user) {
-      //     throw new Error("User not found");
-      //   } else {
-      //     const item = await prisma.item.findUnique({
-      //       where: { id: input.itemId },
-      //     });
+        if (!user) {
+          throw new Error("User not found");
+        }
 
-      //     if (!item) {
-      //       throw new Error("Item doesn't exist");
-      //     } else {
-      //       const cartItem = await prisma.cartItem.findUnique({
-      //         where: { itemId: input.itemId, authorId: input.userId },
-      //       });
-      //       if (!cartItem) {
-      //         const newItem = await prisma.cartItem.create({
-      //           data: {
-      //             title: item.title,
-      //             content: item.content,
-      //             price: item.price,
-      //             author: {
-      //               connect: { id: user.id }, // Connect to the user
-      //             },
-      //             item: { connect: { id: item.id } },
-      //           },
-      //         });
-      //         const cartItems = user.cartitems;
-      //         console.log("Item added to cart:", newItem);
-      //         return cartItems;
-      //       } else {
-      //         const updatedCartItem = await prisma.cartItem.update({
-      //           where: { authorId: input.userId, itemId: input.itemId },
-      //           data: {
-      //             quantity:
-      //           }
-      //         });
-      //       }
-      //     }
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
 
-      //     // Create a new cart item and associate it with the user
-      //   }
-      // } catch (error) {
-      //   console.error("Error adding item to cart:", error);
-      // }
-    ),
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is in the cart
+        const existingCartItem = user.cartitems.find(
+          (cartItem) => cartItem.itemId === input.itemId
+        );
+
+        if (existingCartItem) {
+          // if (existingCartItem.quantity > 1) {
+          //   // If quantity > 1, decrement the quantity
+          //   await prisma.cartItem.update({
+          //     where: { id: existingCartItem.id },
+          //     data: { quantity: existingCartItem.quantity - 1 },
+          //   });
+          // } else {
+          //   // If quantity is 1, remove the cart item
+          //   await prisma.cartItem.delete({
+          //     where: { id: existingCartItem.id },
+          //   });
+          // }
+          // if (input.quantity === 0) {
+          //   await prisma.cartItem.delete({
+          //     where: { id: existingCartItem.id },
+          //   });
+          // } else {
+          await prisma.cartItem.update({
+            where: { id: existingCartItem.id },
+            data: { quantity: input.quantity },
+          });
+          // }
+        }
+
+        console.log("Item deleted from cart");
+      } catch (error) {
+        console.error("Error deleting item from cart:", error);
+      }
+    }),
   deleteCartItem: publicProcedure
     .input(
       z.object({
@@ -184,80 +251,45 @@ const appRouter = router({
         itemId: z.number(),
       })
     )
-    .mutation(
-      async ({ input }) => {
-        try {
-          // Find the user
-          console.log(input);
-          const user = await prisma.user.findUnique({
-            where: { id: input.userId },
-            include: { cartitems: true },
-          });
+    .mutation(async ({ input }) => {
+      try {
+        // Find the user
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { cartitems: true },
+        });
 
-          if (!user) {
-            throw new Error("User not found");
-          }
-
-          // Find the item
-          const item = await prisma.item.findUnique({
-            where: { id: input.itemId },
-          });
-
-          if (!item) {
-            throw new Error("Item not found");
-          }
-
-          // Check if the item is in the cart
-          const existingCartItem = user.cartitems.find(
-            (cartItem) => cartItem.itemId === input.itemId
-          );
-
-          if (existingCartItem) {
-            if (existingCartItem.quantity > 1) {
-              // If quantity > 1, decrement the quantity
-              await prisma.cartItem.update({
-                where: { id: existingCartItem.id },
-                data: { quantity: existingCartItem.quantity - 1 },
-              });
-            } else {
-              // If quantity is 1, remove the cart item
-              await prisma.cartItem.delete({
-                where: { id: existingCartItem.id },
-              });
-            }
-          }
-
-          console.log("Item deleted from cart");
-        } catch (error) {
-          console.error("Error deleting item from cart:", error);
+        if (!user) {
+          throw new Error("User not found");
         }
+
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
+
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is in the cart
+        const existingCartItem = user.cartitems.find(
+          (cartItem) => cartItem.itemId === input.itemId
+        );
+
+        if (existingCartItem) {
+          await prisma.cartItem.delete({
+            where: { id: existingCartItem.id },
+          });
+        } else {
+          throw new Error("Cannot delete item");
+        }
+
+        console.log("Item deleted from cart");
+      } catch (error) {
+        console.error("Error deleting item from cart:", error);
       }
-      // try {
-      //   // Find the user by their ID
-      //   const user = await prisma.user.findUnique({
-      //     where: { id: input.userId },
-      //     include: { cartitems: true },
-      //   });
-
-      //   if (!user) {
-      //     throw new Error("User not found");
-      //   } else {
-      //     const item = await prisma.cartItem.delete({
-      //       where: { id: input.itemId },
-      //     });
-
-      //     if (!item) {
-      //       throw new Error("Item doesn't exist");
-      //     } else {
-      //       return user.cartitems;
-      //     }
-
-      //     // Create a new cart item and associate it with the user
-      //   }
-      // } catch (error) {
-      //   console.error("Error deleting item from cart:", error);
-      // }
-    ),
+    }),
   getCartItems: publicProcedure
     .input(
       z.object({
