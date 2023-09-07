@@ -128,12 +128,22 @@ const Dashboard = ({
                 onChange={(e) => changeItemQuantity({ e, item })}
               ></input>
               <div>{item.quantity}</div>
+              <div>{item.price * item.quantity}</div>
               <button onClick={() => decreaseItemQuantity(item)}>-</button>
               <button onClick={() => deleteFromCart(item)}>DEL</button>
             </div>
           );
         })}
+        <div>
+          TOTAL PRICE:{" "}
+          {cartQuery.data?.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+          )}
+        </div>
+        <button>Checkout</button>
       </div>
+
       <div>
         ICON and Number of items in a cart:{" "}
         <CartIcon
