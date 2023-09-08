@@ -15,7 +15,7 @@ export default function Home() {
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
-  console.log(itemsQuery.data);
+  const addItemToFavoritesMutation = trpc.addToFavorites.useMutation();
 
   const queryClient = useQueryClient();
 
@@ -23,6 +23,12 @@ export default function Home() {
     userId: loggedInUserId,
   });
 
+  const favoritesQuery = trpc.getFavoritesItems.useQuery({
+    userId: loggedInUserId,
+  });
+
+  console.log("items", itemsQuery.data);
+  console.log("favorites", favoritesQuery.data);
   console.log("cart", cartQuery.data);
 
   useEffect(() => {
@@ -54,6 +60,23 @@ export default function Home() {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
           console.log("Add to cart OnSuccess", data);
+        },
+      }
+    );
+  }
+
+  function addToFavorites(item) {
+    // console.log(loggedInUserId);
+    addItemToFavoritesMutation.mutate(
+      {
+        userId: loggedInUserId,
+        itemId: item.id,
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
+          console.log("Add to favorites OnSuccess", data);
         },
       }
     );
@@ -111,6 +134,9 @@ export default function Home() {
               <div>{item.content}</div>
               <div>{item.id}</div>
               <button onClick={() => addToCart(item)}>Add to cart</button>
+              <button onClick={() => addToFavorites(item)}>
+                Add to favorites
+              </button>
             </div>
           </div>
         );

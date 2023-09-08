@@ -13,6 +13,7 @@ model User {
   name  String?
   hashedPassword String?
   cartitems CartItem[]
+  favorites Favorites[]
 }
 
 model CartItem {
@@ -35,4 +36,17 @@ model Item {
   price Int @default(0)
   published Boolean @default(false)
   cartitems CartItem[]
+  favorites Favorites[]
+}
+
+model Favorites {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  price Int @default(0)
+  published Boolean @default(false)
+  author    User    @relation(fields: [authorId], references: [id])
+  authorId  Int
+  item Item @relation(fields: [itemId], references: [id])
+  itemId Int
 }

@@ -311,6 +311,80 @@ const appRouter = router({
         console.error("Error adding item to cart:", error);
       }
     }),
+  getFavoritesItems: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      try {
+        const result = await prisma.favorites.findMany({
+          where: { authorId: input.userId },
+        });
+        return result;
+      } catch (error) {
+        console.error("Error finding favorites for a user", error);
+      }
+    }),
+  addToFavorites: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        itemId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Find the user
+        const user = await prisma.user.findUnique({
+          where: { id: input.userId },
+          include: { favorites: true },
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
+
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is already in the favorites
+        const existingItemInFavorites = user.favorites.find(
+          (favoritesItem) => favoritesItem.itemId === input.itemId
+        );
+
+        if (existingItemInFavorites) {
+          // If the item already in favorites
+          // await prisma.cartItem.update({
+          //   where: { id: existingCartItem.id },
+          //   data: { quantity: existingCartItem.quantity + 1 },
+          // });
+        } else {
+          // If the item doesn't exist, create a new item in favorites
+          await prisma.favorites.create({
+            data: {
+              title: item.title,
+              content: item.content,
+              price: item.price,
+              published: item.published,
+              author: { connect: { id: input.userId } },
+              item: { connect: { id: input.itemId } },
+            },
+          });
+        }
+
+        console.log("Item added to favorites");
+      } catch (error) {
+        console.error("Error adding item to favorites", error);
+      }
+    }),
 });
 
 // export only the type definition of the API
