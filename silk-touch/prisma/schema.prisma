@@ -34,6 +34,8 @@ model Item {
   title     String
   content   String?
   price Int @default(0)
+  category    String  @default("")
+  subcategory String  @default("")
   published Boolean @default(false)
   cartitems CartItem[]
   favorites Favorites[]

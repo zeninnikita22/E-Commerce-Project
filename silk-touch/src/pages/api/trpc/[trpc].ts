@@ -6,6 +6,10 @@ import prisma from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
 
 const appRouter = router({
+  ///
+  /// Fetching items ///
+  ///
+
   getAllItems: publicProcedure.query(async () => {
     const data = await prisma.item.findMany();
     return data;
@@ -31,6 +35,11 @@ const appRouter = router({
         console.log(error);
       }
     }),
+
+  ///
+  /// User login ///
+  ///
+
   loginUser: publicProcedure
     .input(
       z.object({
@@ -65,6 +74,11 @@ const appRouter = router({
         throw new Error("Invalid password");
       }
     }),
+
+  ///
+  /// Cart operations ///
+  ///
+
   addCartItem: publicProcedure
     .input(
       z.object({
@@ -311,6 +325,11 @@ const appRouter = router({
         console.error("Error adding item to cart:", error);
       }
     }),
+
+  ///
+  /// Favorites operations ///
+  ///
+
   getFavoritesItems: publicProcedure
     .input(
       z.object({
@@ -327,7 +346,7 @@ const appRouter = router({
         console.error("Error finding favorites for a user", error);
       }
     }),
-  addToFavorites: publicProcedure
+  changeFavorites: publicProcedure
     .input(
       z.object({
         userId: z.number(),
@@ -361,11 +380,10 @@ const appRouter = router({
         );
 
         if (existingItemInFavorites) {
-          // If the item already in favorites
-          // await prisma.cartItem.update({
-          //   where: { id: existingCartItem.id },
-          //   data: { quantity: existingCartItem.quantity + 1 },
-          // });
+          // If the item already in favorites, delete it
+          await prisma.favorites.delete({
+            where: { id: existingItemInFavorites.id },
+          });
         } else {
           // If the item doesn't exist, create a new item in favorites
           await prisma.favorites.create({
@@ -385,6 +403,10 @@ const appRouter = router({
         console.error("Error adding item to favorites", error);
       }
     }),
+
+  ///
+  /// Admin operations ///
+  ///
 });
 
 // export only the type definition of the API

@@ -15,7 +15,7 @@ export default function Home() {
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
-  const addItemToFavoritesMutation = trpc.addToFavorites.useMutation();
+  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
   const queryClient = useQueryClient();
 
@@ -65,9 +65,9 @@ export default function Home() {
     );
   }
 
-  function addToFavorites(item) {
+  function changeFavorites(item) {
     // console.log(loggedInUserId);
-    addItemToFavoritesMutation.mutate(
+    changeFavoritesItemsMutation.mutate(
       {
         userId: loggedInUserId,
         itemId: item.id,
@@ -134,7 +134,7 @@ export default function Home() {
               <div>{item.content}</div>
               <div>{item.id}</div>
               <button onClick={() => addToCart(item)}>Add to cart</button>
-              <button onClick={() => addToFavorites(item)}>
+              <button onClick={() => changeFavorites(item)}>
                 Add to favorites
               </button>
             </div>
