@@ -7,28 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  isAdmin Boolean @default(false)
-  hashedPassword String?
-  cartitems CartItem[]
-  favorites Favorites[]
+model CartItem {
+  id       String     @id @default(uuid())
+  userId String @default("")
+  quantity Int @default(1)
+
+
+// this is foreign key
+  itemId Int
+  item Item @relation(fields: [itemId], references: [id])
 }
 
-model CartItem {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  price Int @default(0)
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
-  item Item @relation(fields: [itemId], references: [id])
-  itemId Int
-  quantity Int @default(1)
-}
+// const itemsInCart = await prisma.cartItems.findMany({
+//  where:{
+//   userId: input.userId
+//  },
+//  includes:{  
+//  item:true
+//}
+// })
+
+// [{id:'alsdkfjklasd', userId:'asldkfjalsidfjoiqjroi',itemId:1,title:'blah',price:20, content:'blah'},...]
+
 
 model Item {
   id        Int     @id @default(autoincrement())
@@ -39,17 +39,106 @@ model Item {
   subcategory String  @default("")
   published Boolean @default(false)
   cartitems CartItem[]
-  favorites Favorites[]
+  // favorites Favorites[]
 }
 
-model Favorites {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  price Int @default(0)
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
-  item Item @relation(fields: [itemId], references: [id])
-  itemId Int
-}
+// const items = await prisma.items.findMany()
+// [{id:1,title:'blah',cartItems:[]},{id:2,title:'blah1',cartItems:[]},{id:3,title:'blah2',cartItems:[]},{id:4,title:'blah3',cartItems:[]}]
+
+// const addItemToCart = await prisma.itemsInCart.create({
+//  data:{
+//    userId: idFromClerk,
+//    itemId: idOfClickedItem
+//  }
+// })
+
+// const updateItemInCart = async (cartItemId, quantityFromFrontend, userId) => {
+
+//   const cartItem = await prisma.itemsInCart.findOne({
+//     where:{
+//       id: cartItemId 
+//     }
+//   })
+
+//   if(!cartItem){
+// return null
+//   }
+
+//   if(cartItem.userId !== userId){
+//     return new Error('fuck off')
+//   }
+
+// const updateItemInCart = await prisma.itemsInCart.updateOne({
+//   where:{
+//     id: cartItemId
+//   },{
+//     data: quantityFromFrontend
+//   }
+// })
+
+// return updateItemInCart
+
+// }
+
+// model Favorites {
+//   id        Int     @id @default(autoincrement())
+//   title     String
+//   content   String?
+//   price Int @default(0)
+//   published Boolean @default(false)
+//   userId  String @default("")
+//   item Item @relation(fields: [itemId], references: [id])
+//   itemId Int
+// }
+
+
+
+
+
+
+
+// User - separate table
+
+// id
+// name
+// age
+// nationality
+
+// addressForeignKeyId
+// disesaseForeignKeyId
+
+
+// UserAddress - separate table
+
+// address
+// buisenessAddress
+// postalIndex
+
+
+// UserDiseases - separate table
+
+// diseasesForeignKeyId
+
+// heartDisesases []
+// lungDiseasese []
+// liverDiseases []
+
+
+
+// id
+// name
+// age
+// nationality
+// address
+// buisenessAddress
+// postalIndex
+// heartDisesases []
+// lungDiseasese []
+// liverDiseases []
+
+// user.find.where(id,{
+//   include:{
+//     disesases:true,
+//     address:true
+//   }
+// })

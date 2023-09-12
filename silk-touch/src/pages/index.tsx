@@ -5,13 +5,17 @@ import { useState } from "react";
 import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggedInName, setLoggedInName] = useState("");
-  const [loggedInUserId, setLoggedInUserId] = useState(0);
-  const [numberOfCartItems, setNumberOfCartItems] = useState(0);
-  const [cartItems, setCartItems] = useState([]);
+  const { isLoaded, isSignedIn, user } = useUser();
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [loggedInName, setLoggedInName] = useState("");
+  // const [loggedInUserId, setLoggedInUserId] = useState(0);
+  // const [numberOfCartItems, setNumberOfCartItems] = useState(0);
+  // const [cartItems, setCartItems] = useState([]);
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
@@ -20,39 +24,38 @@ export default function Home() {
   const queryClient = useQueryClient();
 
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: loggedInUserId,
+    userId: user?.id,
   });
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: loggedInUserId,
+    userId: user?.id,
   });
 
   console.log("items", itemsQuery.data);
   console.log("favorites", favoritesQuery.data);
   console.log("cart", cartQuery.data);
 
-  useEffect(() => {
-    console.log("Local storage data is:", localStorage.getItem("loggedUser"));
-    if (localStorage.getItem("loggedUser") === null) {
-    } else {
-      const foundUser = JSON.parse(localStorage.getItem("loggedUser"));
-      if (foundUser.isAuthorized) {
-        setIsLoggedIn(true);
-        setLoggedInName(foundUser.name);
-        setLoggedInUserId(foundUser.id);
-      } else if (foundUser.isAuthorized === null) {
-        setIsLoggedIn(false);
-      } else {
-        setIsLoggedIn(false);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log("Local storage data is:", localStorage.getItem("loggedUser"));
+  //   if (localStorage.getItem("loggedUser") === null) {
+  //   } else {
+  //     const foundUser = JSON.parse(localStorage.getItem("loggedUser"));
+  //     if (foundUser.isAuthorized) {
+  //       setIsLoggedIn(true);
+  //       setLoggedInName(foundUser.name);
+  //       setLoggedInUserId(foundUser.id);
+  //     } else if (foundUser.isAuthorized === null) {
+  //       setIsLoggedIn(false);
+  //     } else {
+  //       setIsLoggedIn(false);
+  //     }
+  //   }
+  // }, []);
 
   function addToCart(item) {
-    console.log(loggedInUserId);
     addItemToCartMutation.mutate(
       {
-        userId: loggedInUserId,
+        userId: user?.id,
         itemId: item.id,
       },
       {
@@ -66,10 +69,9 @@ export default function Home() {
   }
 
   function changeFavorites(item) {
-    // console.log(loggedInUserId);
     changeFavoritesItemsMutation.mutate(
       {
-        userId: loggedInUserId,
+        userId: user?.id,
         itemId: item.id,
       },
       {
@@ -82,50 +84,20 @@ export default function Home() {
     );
   }
 
-  // function deleteFromCart(item) {
-  //   /// you are calling it on Click only, right? how about call it on login too?
-  //   deleteItemFromCartMutation.mutate(
-  //     {
-  //       userId: loggedInUserId,
-  //       itemId: item.id,
-  //     },
-  //     {
-  //       onSuccess: (data) => {
-  //         // Invalidate specific queries after the mutation is successful
-  //         queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-  //         console.log("Deleted item", data);
-  //       },
-  //     }
-  //   );
+  // const { isSignedIn, sessionId, userId } = useAuth();
+  // if (isSignedIn) {
+  //   return null;
   // }
+  // console.log(sessionId, userId);
 
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
+  console.log(user);
   return (
     <>
-      {isLoggedIn ? (
-        <Dashboard
-          isLoggedIn={isLoggedIn}
-          setIsLoggedIn={setIsLoggedIn}
-          loggedInName={loggedInName}
-          setLoggedInName={setLoggedInName}
-          loggedInUserId={loggedInUserId}
-          numberOfCartItems={numberOfCartItems}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
-        />
-      ) : null}
-      <Login
-        isLoggedIn={isLoggedIn}
-        setIsLoggedIn={setIsLoggedIn}
-        loggedInName={loggedInName}
-        setLoggedInName={setLoggedInName}
-        numberOfCartItems={numberOfCartItems}
-        setNumberOfCartItems={setNumberOfCartItems}
-        cartItems={cartItems}
-        setCartItems={setCartItems}
-      />
-      <Register />
-      <p>Home</p>
-
+      <UserButton afterSignOutUrl="/" />
+      <div>Hello, {user.id} welcome to Clerk</div>
       {itemsQuery.data?.map((item) => {
         return (
           <div key={item.id}>
@@ -143,4 +115,50 @@ export default function Home() {
       })}
     </>
   );
+
+  // return (
+  //   <>
+  //     {/* <UserButton afterSignOutUrl="/" />
+  //     {isLoggedIn ? (
+  //       <Dashboard
+  //         isLoggedIn={isLoggedIn}
+  //         setIsLoggedIn={setIsLoggedIn}
+  //         loggedInName={loggedInName}
+  //         setLoggedInName={setLoggedInName}
+  //         loggedInUserId={loggedInUserId}
+  //         numberOfCartItems={numberOfCartItems}
+  //         cartItems={cartItems}
+  //         setCartItems={setCartItems}
+  //       />
+  //     ) : null}
+  //     <Login
+  //       isLoggedIn={isLoggedIn}
+  //       setIsLoggedIn={setIsLoggedIn}
+  //       loggedInName={loggedInName}
+  //       setLoggedInName={setLoggedInName}
+  //       numberOfCartItems={numberOfCartItems}
+  //       setNumberOfCartItems={setNumberOfCartItems}
+  //       cartItems={cartItems}
+  //       setCartItems={setCartItems}
+  //     />
+  //     <Register />
+  //     <p>Home</p> */}
+
+  //     {/* {itemsQuery.data?.map((item) => {
+  //       return (
+  //         <div key={item.id}>
+  //           <div>
+  //             <div>{item.title}</div>
+  //             <div>{item.content}</div>
+  //             <div>{item.id}</div>
+  //             <button onClick={() => addToCart(item)}>Add to cart</button>
+  //             <button onClick={() => changeFavorites(item)}>
+  //               Add to favorites
+  //             </button>
+  //           </div>
+  //         </div>
+  //       );
+  //     })} */}
+  //   </>
+  // );
 }
