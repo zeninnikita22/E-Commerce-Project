@@ -18,18 +18,6 @@ model CartItem {
   item Item @relation(fields: [itemId], references: [id])
 }
 
-// const itemsInCart = await prisma.cartItems.findMany({
-//  where:{
-//   userId: input.userId
-//  },
-//  includes:{  
-//  item:true
-//}
-// })
-
-// [{id:'alsdkfjklasd', userId:'asldkfjalsidfjoiqjroi',itemId:1,title:'blah',price:20, content:'blah'},...]
-
-
 model Item {
   id        Int     @id @default(autoincrement())
   title     String
@@ -39,7 +27,14 @@ model Item {
   subcategory String  @default("")
   published Boolean @default(false)
   cartitems CartItem[]
-  // favorites Favorites[]
+  favorites Favorites[]
+}
+
+model Favorites {
+  id        String     @id @default(uuid())
+  userId  String @default("")
+  item Item @relation(fields: [itemId], references: [id])
+  itemId Int
 }
 
 // const items = await prisma.items.findMany()
@@ -80,16 +75,7 @@ model Item {
 
 // }
 
-// model Favorites {
-//   id        Int     @id @default(autoincrement())
-//   title     String
-//   content   String?
-//   price Int @default(0)
-//   published Boolean @default(false)
-//   userId  String @default("")
-//   item Item @relation(fields: [itemId], references: [id])
-//   itemId Int
-// }
+
 
 
 

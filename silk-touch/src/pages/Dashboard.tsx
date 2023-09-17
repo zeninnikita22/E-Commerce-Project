@@ -2,21 +2,12 @@ import React, { useState } from "react";
 import CartIcon from "./CartIcon";
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
+import { UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 
-const Dashboard = ({
-  isLoggedIn,
-  setIsLoggedIn,
-  loggedInName,
-  setLoggedInName,
-  loggedInUserId,
-  numberOfCartItems,
-  cartItems,
-  setCartItems,
-}) => {
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    localStorage.clear();
-  };
+const Dashboard = () => {
+  const { isLoaded, isSignedIn, user } = useUser();
   const decreaseCartItemQuantityMutation = trpc.decreaseCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -24,16 +15,18 @@ const Dashboard = ({
     trpc.updateCartItemQuantity.useMutation();
   const queryClient = useQueryClient();
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: loggedInUserId,
+    userId: user?.id,
   });
 
-  function addToCart(item) {
-    // console.log(item)
-    // console.log(loggedInUserId);
+  function addToCart(element) {
+    const cartElement = cartQuery.data.find(
+      (element) => element.itemId === element.item.id
+    );
     addItemToCartMutation.mutate(
       {
-        userId: loggedInUserId,
-        itemId: item.itemId,
+        userId: user?.id,
+        itemId: element.item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
@@ -45,50 +38,57 @@ const Dashboard = ({
     );
   }
 
-  function decreaseItemQuantity(item) {
-    // console.log(item);
-    /// you are calling it on Click only, right? how about call it on login too?
+  function decreaseItemQuantity(element) {
+    const cartElement = cartQuery.data.find(
+      (element) => element.itemId === element.item.id
+    );
     decreaseCartItemQuantityMutation.mutate(
       {
-        userId: loggedInUserId,
-        itemId: item.itemId,
+        userId: user?.id,
+        itemId: element.item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          // console.log("Deleted item", data);
+          console.log("Decrased item", data);
         },
       }
     );
   }
 
-  function deleteFromCart(item) {
-    // console.log(item);
-    /// you are calling it on Click only, right? how about call it on login too?
+  function deleteFromCart(element) {
+    const cartElement = cartQuery.data.find(
+      (element) => element.itemId === element.item.id
+    );
     deleteItemFromCartMutation.mutate(
       {
-        userId: loggedInUserId,
-        itemId: item.itemId,
+        userId: user?.id,
+        itemId: element.item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["deleteCartItem"] });
-          // console.log("Deleted item", data);
+          console.log("Deleted item", data);
         },
       }
     );
   }
 
-  function changeItemQuantity({ e, item }) {
-    console.log(e.target.value);
+  function changeItemQuantity({ e, element }) {
+    const cartElement = cartQuery.data.find(
+      (element) => element.itemId === element.item.id
+    );
     const quantityValue = e.target.value;
     if (quantityValue !== "") {
       changeCartItemQuantityMutation.mutate(
         {
-          userId: loggedInUserId,
-          itemId: item.itemId,
+          userId: user?.id,
+          itemId: element.item.id,
+          cartItemId: cartElement === undefined ? "" : cartElement?.id,
           quantity: Number(e.target.value),
         },
         {
@@ -102,42 +102,42 @@ const Dashboard = ({
     } else {
       console.log("No value!");
     }
-
-    // // console.log("Item quantity is", item.quantity, item.itemId);
   }
+
+  console.log(cartQuery.data);
 
   return (
     <>
       <p>/// This is hidden dashboard ///</p>
       <h1>Cart Items:</h1>
       <div>
-        {cartQuery.data?.map((item) => {
+        {cartQuery.data?.map((element) => {
           return (
-            <div key={item.id}>
-              <button onClick={() => addToCart(item)}>+</button>
-              <div>{item.title}</div>
+            <div key={element.id}>
+              <button onClick={() => addToCart(element)}>+</button>
+              <div>{element.item.title}</div>
               <input
                 type="number"
                 min="0"
                 max="99"
                 value={
                   cartQuery.data?.filter(
-                    (cartItem) => cartItem.itemId === item.itemId
+                    (cartItem) => cartItem.itemId === element.item.id
                   )[0].quantity
                 }
-                onChange={(e) => changeItemQuantity({ e, item })}
+                onChange={(e) => changeItemQuantity({ e, element })}
               ></input>
-              <div>{item.quantity}</div>
-              <div>{item.price * item.quantity}</div>
-              <button onClick={() => decreaseItemQuantity(item)}>-</button>
-              <button onClick={() => deleteFromCart(item)}>DEL</button>
+              <div>{element.quantity}</div>
+              <div>{element.item.price * element.quantity}</div>
+              <button onClick={() => decreaseItemQuantity(element)}>-</button>
+              <button onClick={() => deleteFromCart(element)}>DEL</button>
             </div>
           );
         })}
         <div>
           TOTAL PRICE:{" "}
           {cartQuery.data?.reduce(
-            (acc, item) => acc + item.price * item.quantity,
+            (acc, item) => acc + item.item.price * item.quantity,
             0
           )}
         </div>
@@ -146,13 +146,8 @@ const Dashboard = ({
 
       <div>
         ICON and Number of items in a cart:{" "}
-        <CartIcon
-          numberOfCartItems={numberOfCartItems}
-          loggedInUserId={loggedInUserId}
-        />
+        {/* <CartIcon numberOfCartItems={numberOfCartItems} /> */}
       </div>
-      <p>Hello, {loggedInName}</p>
-      <button onClick={handleLogout}>Log out</button>
     </>
   );
 };

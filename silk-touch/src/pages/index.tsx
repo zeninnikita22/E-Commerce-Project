@@ -53,10 +53,14 @@ export default function Home() {
   // }, []);
 
   function addToCart(item) {
+    const cartElement = cartQuery.data.find(
+      (element) => element.itemId === item.id
+    );
     addItemToCartMutation.mutate(
       {
         userId: user?.id,
         itemId: item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
@@ -69,10 +73,15 @@ export default function Home() {
   }
 
   function changeFavorites(item) {
+    const favoritesElement = favoritesQuery.data.find(
+      (element) => element.itemId === item.id
+    );
+    console.log(favoritesQuery.data);
     changeFavoritesItemsMutation.mutate(
       {
         userId: user?.id,
         itemId: item.id,
+        favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
       {
         onSuccess: (data) => {
@@ -98,6 +107,7 @@ export default function Home() {
     <>
       <UserButton afterSignOutUrl="/" />
       <div>Hello, {user.id} welcome to Clerk</div>
+      <Dashboard />
       {itemsQuery.data?.map((item) => {
         return (
           <div key={item.id}>

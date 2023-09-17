@@ -78,12 +78,12 @@ const appRouter = router({
   ///
   /// Cart operations ///
   ///
-
   addCartItem: publicProcedure
     .input(
       z.object({
         userId: z.string(),
         itemId: z.number(),
+        cartItemId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -97,35 +97,25 @@ const appRouter = router({
           throw new Error("Such item wasn't found in database");
         }
 
-        // If it is in the database, create a new cart item
-        const itemsInCart = await prisma.cartItem.findMany({
-          where: {
-            userId: input.userId,
-          },
-          includes: {
-            item: true,
-          },
+        const cartItemToUpdate = await prisma.cartItem.findUnique({
+          where: { id: input.cartItemId },
         });
 
-        // If there is not, create such a cart item
-        if (!cartItem) {
+        if (!cartItemToUpdate) {
           await prisma.cartItem.create({
             data: {
-              title: item.title,
-              content: item.content,
-              price: item.price,
-              published: item.published,
               userId: input.userId,
               item: { connect: { id: input.itemId } },
               quantity: 1,
             },
           });
         } else {
-          // If there is, increment the amount of such an item with such userId in a cart
           await prisma.cartItem.update({
-            where: { itemId: input.itemId, userId: input.userId },
+            where: {
+              id: input.cartItemId,
+            },
             data: {
-              quantity: cartItem.quantity + 1,
+              quantity: cartItemToUpdate.quantity + 1,
             },
           });
         }
@@ -133,62 +123,6 @@ const appRouter = router({
       } catch (error) {
         console.error("Error adding item to cart:", error);
       }
-
-      // try {
-
-      //   // Find if the item is in cart already
-      //   const cartItem = await prisma.cartItem.findUnique({
-      //     where: { userId: input.userId },
-      //   });
-
-      //   if (!cartItem) {
-      //     const cartItem = await prisma.cartItem.create({
-      //       data: {
-
-      //       }
-      //     })
-      //     throw new Error("User not found");
-      //   }
-
-      //   // Find the item
-      //   const item = await prisma.item.findUnique({
-      //     where: { id: input.itemId },
-      //   });
-
-      //   if (!item) {
-      //     throw new Error("Item not found");
-      //   }
-
-      //   // Check if the item is already in the cart
-      //   const existingCartItem = user.cartitems.find(
-      //     (cartItem) => cartItem.itemId === input.itemId
-      //   );
-
-      //   if (existingCartItem) {
-      //     // If the item already exists, increment its quantity
-      //     await prisma.cartItem.update({
-      //       where: { id: existingCartItem.id },
-      //       data: { quantity: existingCartItem.quantity + 1 },
-      //     });
-      //   } else {
-      //     // If the item doesn't exist, create a new cart item
-      //     await prisma.cartItem.create({
-      //       data: {
-      //         title: item.title,
-      //         content: item.content,
-      //         price: item.price,
-      //         published: item.published,
-      //         author: { connect: { id: input.userId } },
-      //         item: { connect: { id: input.itemId } },
-      //         quantity: 1,
-      //       },
-      //     });
-      //   }
-
-      //   console.log("Item added to cart");
-      // } catch (error) {
-      //   console.error("Error adding item to cart:", error);
-      // }
     }),
 
   decreaseCartItem: publicProcedure
@@ -196,6 +130,7 @@ const appRouter = router({
       z.object({
         userId: z.string(),
         itemId: z.number(),
+        cartItemId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -209,22 +144,22 @@ const appRouter = router({
           throw new Error("Such item wasn't found in database");
         } else {
           // If it is in the database, check if there is such item with such user id in the cartitems
-          const cartItem = await prisma.cartItem.findUnique({
-            where: { itemId: input.itemId, userId: input.userId },
+          const cartItemToDecrease = await prisma.cartItem.findUnique({
+            where: { id: input.cartItemId },
           });
 
           // If such cartitem with such user id exists, then depending on quantity either decrease quantity by 1 or delete the item from cart
-          if (cartItem) {
-            if (cartItem.quantity > 1) {
+          if (cartItemToDecrease) {
+            if (cartItemToDecrease.quantity > 1) {
               // If quantity > 1, decrement the quantity
               await prisma.cartItem.update({
-                where: { id: cartItem.id, userId: input.userId },
-                data: { quantity: cartItem.quantity - 1 },
+                where: { id: cartItemToDecrease.id },
+                data: { quantity: cartItemToDecrease.quantity - 1 },
               });
             } else {
               // If quantity is 1, remove the cart item
               await prisma.cartItem.update({
-                where: { id: cartItem.id, userId: input.userId },
+                where: { id: cartItemToDecrease.id },
                 data: { quantity: 0 }, /// Does it remove on 0?
               });
             }
@@ -282,12 +217,14 @@ const appRouter = router({
       //   console.error("Error decreasing number of items in cart:", error);
       // }
     }),
+
   updateCartItemQuantity: publicProcedure
     .input(
       z.object({
         userId: z.string(),
         itemId: z.number(),
         quantity: z.number(),
+        cartItemId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -301,12 +238,12 @@ const appRouter = router({
           throw new Error("Such item wasn't found in database");
         } else {
           // If it is in the database, check if there is such item with such user id in the cartitems
-          const cartItem = await prisma.cartItem.findUnique({
-            where: { itemId: input.itemId, userId: input.userId },
+          const cartItemToUpdate = await prisma.cartItem.findUnique({
+            where: { id: input.cartItemId },
           });
-          if (cartItem) {
+          if (cartItemToUpdate) {
             await prisma.cartItem.update({
-              where: { id: cartItem.id, userId: input.userId },
+              where: { id: cartItemToUpdate.id },
               data: { quantity: input.quantity },
             });
           } else {
@@ -339,9 +276,9 @@ const appRouter = router({
         //   // }
         // }
 
-        console.log("Item deleted from cart");
+        console.log("Updated quantity of items in a cart");
       } catch (error) {
-        console.error("Error deleting item from cart:", error);
+        console.error("Error updating quantity of items in a cart:", error);
       }
     }),
   deleteCartItem: publicProcedure
@@ -349,6 +286,7 @@ const appRouter = router({
       z.object({
         userId: z.string(),
         itemId: z.number(),
+        cartItemId: z.string(),
       })
     )
     .mutation(async ({ input }) => {
@@ -362,12 +300,12 @@ const appRouter = router({
           throw new Error("Such item wasn't found in database");
         } else {
           // If it is in the database, check if there is such item with such user id in the cartitems
-          const cartItem = await prisma.cartItem.findUnique({
-            where: { itemId: input.itemId, userId: input.userId },
+          const cartItemToDelete = await prisma.cartItem.findUnique({
+            where: { id: input.cartItemId },
           });
-          if (cartItem) {
+          if (cartItemToDelete) {
             await prisma.cartItem.delete({
-              where: { id: cartItem.id, userId: input.userId },
+              where: { id: cartItemToDelete.id },
             });
           } else {
             throw new Error("No such item in a cart");
@@ -410,6 +348,7 @@ const appRouter = router({
       try {
         const result = await prisma.cartItem.findMany({
           where: { userId: input.userId },
+          include: { item: true },
         });
         return result;
         // Create a new cart item and associate it with the user
@@ -422,72 +361,69 @@ const appRouter = router({
   /// Favorites operations ///
   ///
 
-  // getFavoritesItems: publicProcedure
-  //   .input(
-  //     z.object({
-  //       userId: z.string(),
-  //     })
-  //   )
-  //   .query(async ({ input }) => {
-  //     try {
-  //       const result = await prisma.favorites.findMany({
-  //         where: { userId: input.userId },
-  //       });
-  //       return result;
-  //     } catch (error) {
-  //       console.error("Error finding favorites for a user", error);
-  //     }
-  //   }),
-  // changeFavorites: publicProcedure
-  //   .input(
-  //     z.object({
-  //       userId: z.string(),
-  //       itemId: z.number(),
-  //     })
-  //   )
-  //   .mutation(async ({ input }) => {
-  //     try {
-  //       // Find the item
-  //       const item = await prisma.item.findUnique({
-  //         where: { id: input.itemId },
-  //       });
+  getFavoritesItems: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      try {
+        const result = await prisma.favorites.findMany({
+          where: { userId: input.userId },
+          include: { item: true },
+        });
+        return result;
+      } catch (error) {
+        console.error("Error finding favorites for a user", error);
+      }
+    }),
+  changeFavorites: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        itemId: z.number(),
+        favoritesId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
 
-  //       if (!item) {
-  //         throw new Error("Item not found");
-  //       }
+        if (!item) {
+          throw new Error("Item not found");
+        }
 
-  //       // Check if the item is already in the favorites
-  //       const favoritesItem = await prisma.favorites.findUnique({
-  //         where: {
-  //           itemId: input.itemId,
-  //           userId: input.userId,
-  //         },
-  //       });
+        // Check if the item is already in the favorites
+        const favoritesItem = await prisma.favorites.findUnique({
+          where: {
+            id: input.favoritesId,
+          },
+        });
 
-  //       if (favoritesItem) {
-  //         // If the item already in favorites, delete it
-  //         await prisma.favorites.delete({
-  //           where: { itemId: favoritesItem.itemId, userId: input.userId },
-  //         });
-  //       } else {
-  //         // If the item doesn't exist, create a new item in favorites
-  //         await prisma.favorites.create({
-  //           data: {
-  //             title: item.title,
-  //             content: item.content,
-  //             price: item.price,
-  //             published: item.published,
-  //             userId: input.userId,
-  //             item: { connect: { id: input.itemId } },
-  //           },
-  //         });
-  //       }
+        if (favoritesItem) {
+          // If the item already in favorites, delete it
+          await prisma.favorites.delete({
+            where: { id: input.favoritesId },
+          });
+        } else {
+          // If the item doesn't exist, create a new item in favorites
+          await prisma.favorites.create({
+            data: {
+              userId: input.userId,
+              item: { connect: { id: input.itemId } },
+            },
+          });
+        }
 
-  //       console.log("Item added to favorites");
-  //     } catch (error) {
-  //       console.error("Error adding item to favorites", error);
-  //     }
-  //   }),
+        console.log("Item added to favorites");
+      } catch (error) {
+        console.error("Error adding item to favorites", error);
+      }
+    }),
 
   ///
   /// Admin operations ///
