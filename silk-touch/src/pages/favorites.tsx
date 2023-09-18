@@ -4,7 +4,8 @@ import { useUser } from "@clerk/nextjs";
 
 export default function Favorites() {
   const { isLoaded, isSignedIn, user } = useUser();
-  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
+  const deleteItemFromFavoritesMuattion =
+    trpc.deleteFromFavorites.useMutation();
 
   const queryClient = useQueryClient();
 
@@ -14,13 +15,13 @@ export default function Favorites() {
 
   function deleteFromFavorites(item) {
     const favoritesElement = favoritesQuery.data.find(
-      (element) => element.itemId === item.id
+      (element) => element.itemId === item.item.id
     );
     console.log(favoritesQuery.data);
-    changeFavoritesItemsMutation.mutate(
+    deleteItemFromFavoritesMuattion.mutate(
       {
         userId: user?.id,
-        itemId: item.id,
+        itemId: item.item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
       {

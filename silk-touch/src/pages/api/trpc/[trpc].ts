@@ -4,6 +4,7 @@ import { z } from "zod";
 // import axios from "axios";
 import prisma from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
+import { error } from "console";
 
 const appRouter = router({
   ///
@@ -422,6 +423,48 @@ const appRouter = router({
         console.log("Item added to favorites");
       } catch (error) {
         console.error("Error adding item to favorites", error);
+      }
+    }),
+
+  deleteFromFavorites: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        itemId: z.number(),
+        favoritesId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Find the item
+        const item = await prisma.item.findUnique({
+          where: { id: input.itemId },
+        });
+
+        if (!item) {
+          throw new Error("Item not found");
+        }
+
+        // Check if the item is already in the favorites
+        const favoritesItem = await prisma.favorites.findUnique({
+          where: {
+            id: input.favoritesId,
+          },
+        });
+
+        if (favoritesItem) {
+          // If the item already in favorites, delete it
+          await prisma.favorites.delete({
+            where: { id: input.favoritesId },
+          });
+        } else {
+          // If the item doesn't exist, error!
+          throw new Error("Such item is not in the favorites");
+        }
+
+        console.log("Item deleted from favorites");
+      } catch (error) {
+        console.error("Error deleting item from favorites", error);
       }
     }),
 
