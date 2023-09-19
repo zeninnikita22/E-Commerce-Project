@@ -345,6 +345,56 @@ const appRouter = router({
         console.error("Error creating an item", error);
       }
     }),
+
+  updateItem: publicProcedure
+    .input(
+      z.object({
+        itemId: z.number(),
+        title: z.string(),
+        content: z.string(),
+        price: z.number(),
+        category: z.string(),
+        subcategory: z.string(),
+        published: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await prisma.item.update({
+          where: {
+            id: input.itemId,
+          },
+          data: {
+            title: input.title,
+            content: input.content,
+            price: input.price,
+            category: input.category,
+            subcategory: input.subcategory,
+            published: input.published,
+          },
+        });
+      } catch (error) {
+        console.error("Error updating an item", error);
+      }
+    }),
+
+  deleteItem: publicProcedure
+    .input(
+      z.object({
+        itemId: z.number(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await prisma.item.delete({
+          where: {
+            id: input.itemId,
+          },
+        });
+      } catch (error) {
+        console.error("Error deleting an item", error);
+      }
+    }),
 });
 
 // export only the type definition of the API
