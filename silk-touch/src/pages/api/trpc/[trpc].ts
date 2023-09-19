@@ -15,66 +15,6 @@ const appRouter = router({
     const data = await prisma.item.findMany();
     return data;
   }),
-  // registerUser: publicProcedure
-  //   .input(
-  //     z.object({
-  //       name: z.string(),
-  //       email: z.string().email(),
-  //       password: z.string(),
-  //     })
-  //   )
-  //   .mutation(async ({ input }) => {
-  //     try {
-  //       await prisma.user.create({
-  //         data: {
-  //           name: input.name,
-  //           email: input.email,
-  //           hashedPassword: input.password,
-  //         },
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }),
-
-  ///
-  /// User login ///
-  ///
-
-  // loginUser: publicProcedure
-  //   .input(
-  //     z.object({
-  //       email: z.string().email(),
-  //       password: z.string(),
-  //     })
-  //   )
-  //   .mutation(async ({ input }) => {
-  //     const user = await prisma.user.findUnique({
-  //       where: { email: input.email },
-  //       include: { cartitems: true },
-  //     });
-
-  //     if (!user) {
-  //       throw new Error("User not found");
-  //     }
-
-  //     const passwordMatch = await bcrypt.compare(
-  //       input.password,
-  //       user.hashedPassword
-  //     );
-
-  //     if (passwordMatch) {
-  //       return {
-  //         isAuthorized: true,
-  //         name: user.name,
-  //         email: user.email,
-  //         id: user.id,
-  //         cartItems: user.cartitems,
-  //       };
-  //     } else {
-  //       throw new Error("Invalid password");
-  //     }
-  //   }),
 
   ///
   /// Cart operations ///
@@ -170,53 +110,6 @@ const appRouter = router({
       } catch (error) {
         console.error("Error deleting item from cart:", error);
       }
-
-      // try {
-      //   // Find the user
-      //   console.log(input);
-      //   const user = await prisma.user.findUnique({
-      //     where: { id: input.userId },
-      //     include: { cartitems: true },
-      //   });
-
-      //   if (!user) {
-      //     throw new Error("User not found");
-      //   }
-
-      //   // Find the item
-      //   const item = await prisma.item.findUnique({
-      //     where: { id: input.itemId },
-      //   });
-
-      //   if (!item) {
-      //     throw new Error("Item not found");
-      //   }
-
-      //   // Check if the item is in the cart
-      //   const existingCartItem = user.cartitems.find(
-      //     (cartItem) => cartItem.itemId === input.itemId
-      //   );
-
-      //   if (existingCartItem) {
-      //     if (existingCartItem.quantity > 1) {
-      //       // If quantity > 1, decrement the quantity
-      //       await prisma.cartItem.update({
-      //         where: { id: existingCartItem.id },
-      //         data: { quantity: existingCartItem.quantity - 1 },
-      //       });
-      //     } else {
-      //       // If quantity is 1, remove the cart item
-      //       await prisma.cartItem.update({
-      //         where: { id: existingCartItem.id },
-      //         data: { quantity: 0 },
-      //       });
-      //     }
-      //   }
-
-      //   // console.log("Item deleted from cart");
-      // } catch (error) {
-      //   console.error("Error decreasing number of items in cart:", error);
-      // }
     }),
 
   updateCartItemQuantity: publicProcedure
@@ -251,32 +144,6 @@ const appRouter = router({
             throw new Error("No such item in a cart");
           }
         }
-
-        // if (cartItem) {
-        //   // if (existingCartItem.quantity > 1) {
-        //   //   // If quantity > 1, decrement the quantity
-        //   //   await prisma.cartItem.update({
-        //   //     where: { id: existingCartItem.id },
-        //   //     data: { quantity: existingCartItem.quantity - 1 },
-        //   //   });
-        //   // } else {
-        //   //   // If quantity is 1, remove the cart item
-        //   //   await prisma.cartItem.delete({
-        //   //     where: { id: existingCartItem.id },
-        //   //   });
-        //   // }
-        //   // if (input.quantity === 0) {
-        //   //   await prisma.cartItem.delete({
-        //   //     where: { id: existingCartItem.id },
-        //   //   });
-        //   // } else {
-        //   await prisma.cartItem.update({
-        //     where: { id: existingCartItem.id },
-        //     data: { quantity: input.quantity },
-        //   });
-        //   // }
-        // }
-
         console.log("Updated quantity of items in a cart");
       } catch (error) {
         console.error("Error updating quantity of items in a cart:", error);
@@ -313,23 +180,6 @@ const appRouter = router({
           }
         }
 
-        // if (!item) {
-        //   throw new Error("Item not found");
-        // }
-
-        // // Check if the item is in the cart
-        // const existingCartItem = user.cartitems.find(
-        //   (cartItem) => cartItem.itemId === input.itemId
-        // );
-
-        // if (existingCartItem) {
-        //   await prisma.cartItem.delete({
-        //     where: { id: existingCartItem.id },
-        //   });
-        // } else {
-        //   throw new Error("Cannot delete item");
-        // }
-
         console.log("Item deleted from cart");
       } catch (error) {
         console.error("Error deleting item from cart:", error);
@@ -342,10 +192,6 @@ const appRouter = router({
       })
     )
     .query(async ({ input }) => {
-      // const cartItems = await prisma.user.findUnique({
-      //   where: { email: input.email },
-      // });
-      // return cartItems;
       try {
         const result = await prisma.cartItem.findMany({
           where: { userId: input.userId },
@@ -471,6 +317,34 @@ const appRouter = router({
   ///
   /// Admin operations ///
   ///
+
+  createItem: publicProcedure
+    .input(
+      z.object({
+        title: z.string(),
+        content: z.string(),
+        price: z.number(),
+        category: z.string(),
+        subcategory: z.string(),
+        published: z.boolean(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        await prisma.item.create({
+          data: {
+            title: input.title,
+            content: input.content,
+            price: input.price,
+            category: input.category,
+            subcategory: input.subcategory,
+            published: input.published,
+          },
+        });
+      } catch (error) {
+        console.error("Error creating an item", error);
+      }
+    }),
 });
 
 // export only the type definition of the API

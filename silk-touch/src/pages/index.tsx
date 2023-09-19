@@ -20,12 +20,11 @@ export default function Home() {
   // const [loggedInUserId, setLoggedInUserId] = useState(0);
   // const [numberOfCartItems, setNumberOfCartItems] = useState(0);
   // const [cartItems, setCartItems] = useState([]);
+  const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
-
-  const queryClient = useQueryClient();
 
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
