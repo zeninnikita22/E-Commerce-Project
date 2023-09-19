@@ -1,6 +1,7 @@
 import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
+import Sort from "./Sort";
 import { useState } from "react";
 import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
@@ -8,8 +9,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import Search from "./Search";
 
 export default function Home() {
+  const [searchInput, setSearchInput] = useState("");
+  const [sortInput, setSortInput] = useState("");
   const { isLoaded, isSignedIn, user } = useUser();
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const [loggedInName, setLoggedInName] = useState("");
@@ -105,70 +109,73 @@ export default function Home() {
   console.log(user);
   return (
     <>
+      <Search searchInput={searchInput} setSearchInput={setSearchInput} />
       <UserButton afterSignOutUrl="/" />
       <div>Hello, {user.id} welcome to Clerk</div>
       <Dashboard />
-      {itemsQuery.data?.map((item) => {
-        return (
-          <div key={item.id}>
-            <div>
-              <div>{item.title}</div>
-              <div>{item.content}</div>
-              <div>{item.id}</div>
-              <button onClick={() => addToCart(item)}>Add to cart</button>
-              <button onClick={() => changeFavorites(item)}>
-                Add to favorites
-              </button>
-            </div>
-          </div>
-        );
-      })}
+      <Sort sortInput={sortInput} setSortInput={setSortInput} />
+      {searchInput !== ""
+        ? itemsQuery.data
+            .filter(
+              (item) =>
+                searchInput &&
+                item &&
+                item.title &&
+                item.title.toLowerCase().includes(searchInput)
+            )
+            .sort((a, b) => {
+              if (sortInput === "priceLH") return a.price - b.price;
+              if (sortInput === "priceHL") return b.price - a.price;
+              return 0;
+            })
+            .map((item) => {
+              return (
+                <div key={item.id}>
+                  <div>
+                    <div>{item.title}</div>
+                    <div>{item.content}</div>
+                    <div>{item.price}</div>
+                    <button onClick={() => addToCart(item)}>Add to cart</button>
+                    <button onClick={() => changeFavorites(item)}>
+                      Add to favorites
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+        : itemsQuery.data
+            .sort((a, b) => {
+              if (sortInput === "priceLH") return a.price - b.price;
+              if (sortInput === "priceHL") return b.price - a.price;
+              if (sortInput === "nameAZ")
+                return a.title.toUpperCase() < b.title.toUpperCase()
+                  ? -1
+                  : a.title.toUpperCase() > b.title.toUpperCase()
+                  ? 1
+                  : 0;
+              if (sortInput === "nameZA")
+                return a.title.toUpperCase() < b.title.toUpperCase()
+                  ? 1
+                  : a.title.toUpperCase() > b.title.toUpperCase()
+                  ? -1
+                  : 0;
+              return 0;
+            })
+            .map((item) => {
+              return (
+                <div key={item.id}>
+                  <div>
+                    <div>{item.title}</div>
+                    <div>{item.content}</div>
+                    <div>{item.price}</div>
+                    <button onClick={() => addToCart(item)}>Add to cart</button>
+                    <button onClick={() => changeFavorites(item)}>
+                      Add to favorites
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
     </>
   );
-
-  // return (
-  //   <>
-  //     {/* <UserButton afterSignOutUrl="/" />
-  //     {isLoggedIn ? (
-  //       <Dashboard
-  //         isLoggedIn={isLoggedIn}
-  //         setIsLoggedIn={setIsLoggedIn}
-  //         loggedInName={loggedInName}
-  //         setLoggedInName={setLoggedInName}
-  //         loggedInUserId={loggedInUserId}
-  //         numberOfCartItems={numberOfCartItems}
-  //         cartItems={cartItems}
-  //         setCartItems={setCartItems}
-  //       />
-  //     ) : null}
-  //     <Login
-  //       isLoggedIn={isLoggedIn}
-  //       setIsLoggedIn={setIsLoggedIn}
-  //       loggedInName={loggedInName}
-  //       setLoggedInName={setLoggedInName}
-  //       numberOfCartItems={numberOfCartItems}
-  //       setNumberOfCartItems={setNumberOfCartItems}
-  //       cartItems={cartItems}
-  //       setCartItems={setCartItems}
-  //     />
-  //     <Register />
-  //     <p>Home</p> */}
-
-  //     {/* {itemsQuery.data?.map((item) => {
-  //       return (
-  //         <div key={item.id}>
-  //           <div>
-  //             <div>{item.title}</div>
-  //             <div>{item.content}</div>
-  //             <div>{item.id}</div>
-  //             <button onClick={() => addToCart(item)}>Add to cart</button>
-  //             <button onClick={() => changeFavorites(item)}>
-  //               Add to favorites
-  //             </button>
-  //           </div>
-  //         </div>
-  //       );
-  //     })} */}
-  //   </>
-  // );
 }
