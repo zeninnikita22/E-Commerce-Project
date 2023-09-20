@@ -145,8 +145,7 @@ const Dashboard = () => {
       </div>
 
       <div>
-        ICON and Number of items in a cart:{" "}
-        {/* <CartIcon numberOfCartItems={numberOfCartItems} /> */}
+        ICON and Number of items in a cart: <CartIcon />
       </div>
     </>
   );

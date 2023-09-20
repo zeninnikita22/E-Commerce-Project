@@ -15,11 +15,8 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const [sortInput, setSortInput] = useState("");
   const { isLoaded, isSignedIn, user } = useUser();
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  // const [loggedInName, setLoggedInName] = useState("");
-  // const [loggedInUserId, setLoggedInUserId] = useState(0);
+
   // const [numberOfCartItems, setNumberOfCartItems] = useState(0);
-  // const [cartItems, setCartItems] = useState([]);
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -37,23 +34,6 @@ export default function Home() {
   console.log("items", itemsQuery.data);
   console.log("favorites", favoritesQuery.data);
   console.log("cart", cartQuery.data);
-
-  // useEffect(() => {
-  //   console.log("Local storage data is:", localStorage.getItem("loggedUser"));
-  //   if (localStorage.getItem("loggedUser") === null) {
-  //   } else {
-  //     const foundUser = JSON.parse(localStorage.getItem("loggedUser"));
-  //     if (foundUser.isAuthorized) {
-  //       setIsLoggedIn(true);
-  //       setLoggedInName(foundUser.name);
-  //       setLoggedInUserId(foundUser.id);
-  //     } else if (foundUser.isAuthorized === null) {
-  //       setIsLoggedIn(false);
-  //     } else {
-  //       setIsLoggedIn(false);
-  //     }
-  //   }
-  // }, []);
 
   function addToCart(item) {
     const cartElement = cartQuery.data.find(
