@@ -86,6 +86,13 @@ export default function Home() {
     return null;
   }
   console.log(user);
+
+  // if (itemsQuery.isLoading && !itemsQuery.data) {
+  //   return "...";
+  // }
+
+  console.log("TEXTOVY MARKER", itemsQuery.data);
+
   return (
     <>
       <Search searchInput={searchInput} setSearchInput={setSearchInput} />
@@ -93,68 +100,94 @@ export default function Home() {
       <div>Hello, {user.id} welcome to Clerk</div>
       <Dashboard />
       <Sort sortInput={sortInput} setSortInput={setSortInput} />
-      {searchInput !== ""
-        ? itemsQuery.data
-            .filter(
-              (item) =>
-                searchInput &&
-                item &&
-                item.title &&
-                item.title.toLowerCase().includes(searchInput)
-            )
-            .sort((a, b) => {
-              if (sortInput === "priceLH") return a.price - b.price;
-              if (sortInput === "priceHL") return b.price - a.price;
-              return 0;
-            })
-            .map((item) => {
-              return (
-                <div key={item.id}>
-                  <div>
-                    <div>{item.title}</div>
-                    <div>{item.content}</div>
-                    <div>{item.price}</div>
-                    <button onClick={() => addToCart(item)}>Add to cart</button>
-                    <button onClick={() => changeFavorites(item)}>
-                      Add to favorites
-                    </button>
+      {/* osoznanno peresmotri cod! */}
+      {
+        itemsQuery.data?.length === 0
+          ? "..."
+          : searchInput !== ""
+          ? itemsQuery.data
+              ?.filter(
+                (item) =>
+                  searchInput &&
+                  item &&
+                  item.title &&
+                  item.title.toLowerCase().includes(searchInput)
+              )
+              .sort((a, b) => {
+                if (sortInput === "priceLH") return a.price - b.price;
+                if (sortInput === "priceHL") return b.price - a.price;
+                return 0;
+              })
+              .map((item) => {
+                return (
+                  <div key={item.id}>
+                    <div>
+                      <div>{item.title}</div>
+                      <div>{item.content}</div>
+                      <div>{item.price}</div>
+                      <button onClick={() => addToCart(item)}>
+                        Add to cart
+                      </button>
+                      <button onClick={() => changeFavorites(item)}>
+                        Add to favorites
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })
-        : itemsQuery.data
-            .sort((a, b) => {
-              if (sortInput === "priceLH") return a.price - b.price;
-              if (sortInput === "priceHL") return b.price - a.price;
-              if (sortInput === "nameAZ")
-                return a.title.toUpperCase() < b.title.toUpperCase()
-                  ? -1
-                  : a.title.toUpperCase() > b.title.toUpperCase()
-                  ? 1
-                  : 0;
-              if (sortInput === "nameZA")
-                return a.title.toUpperCase() < b.title.toUpperCase()
-                  ? 1
-                  : a.title.toUpperCase() > b.title.toUpperCase()
-                  ? -1
-                  : 0;
-              return 0;
-            })
-            .map((item) => {
-              return (
-                <div key={item.id}>
-                  <div>
-                    <div>{item.title}</div>
-                    <div>{item.content}</div>
-                    <div>{item.price}</div>
-                    <button onClick={() => addToCart(item)}>Add to cart</button>
-                    <button onClick={() => changeFavorites(item)}>
-                      Add to favorites
-                    </button>
+                );
+              })
+          : itemsQuery.data
+              ?.sort((a, b) => {
+                if (sortInput === "priceLH") return a.price - b.price;
+                if (sortInput === "priceHL") return b.price - a.price;
+                if (sortInput === "nameAZ")
+                  return a.title.toUpperCase() < b.title.toUpperCase()
+                    ? -1
+                    : a.title.toUpperCase() > b.title.toUpperCase()
+                    ? 1
+                    : 0;
+                if (sortInput === "nameZA")
+                  return a.title.toUpperCase() < b.title.toUpperCase()
+                    ? 1
+                    : a.title.toUpperCase() > b.title.toUpperCase()
+                    ? -1
+                    : 0;
+                return 0;
+              })
+              .map((item) => {
+                return (
+                  <div key={item.id}>
+                    <div>
+                      <div>{item.title}</div>
+                      <div>{item.content}</div>
+                      <div>{item.price}</div>
+                      <button onClick={() => addToCart(item)}>
+                        Add to cart
+                      </button>
+                      <button onClick={() => changeFavorites(item)}>
+                        Add to favorites
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+
+        // itemsQuery.data?.length === 0
+        //   ? "..."
+        //   : itemsQuery.data
+        //       ?.sort((a, b) => {
+        //         if (sortInput === "priceLH") return a.price - b.price;
+        //         if (sortInput === "priceHL") return b.price - a.price;
+        //         return 0;
+        //       })
+        //       .map((item) => {
+        //         return (
+        //           <>
+        //             <>{item.title}</>
+        //             <>{item.price}</>
+        //           </>
+        //         );
+        //       })
+      }
     </>
   );
 }
