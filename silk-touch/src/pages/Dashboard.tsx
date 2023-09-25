@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/router";
 
 const Dashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -13,10 +14,13 @@ const Dashboard = () => {
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const changeCartItemQuantityMutation =
     trpc.updateCartItemQuantity.useMutation();
+  const createCheckoutSessionMutation =
+    trpc.createCheckoutSession.useMutation();
   const queryClient = useQueryClient();
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
   });
+  const router = useRouter();
 
   function addToCart(element) {
     const cartElement = cartQuery.data.find(
@@ -104,6 +108,24 @@ const Dashboard = () => {
     }
   }
 
+  function checkout() {
+    const cartItems = cartQuery.data.map((cartItem) => ({
+      quantity: cartItem.quantity,
+      priceIdStrapi: cartItem.item.priceIdStrapi,
+    }));
+
+    createCheckoutSessionMutation.mutate(
+      {
+        cartItems, // Pass the cart items as an array
+      },
+      {
+        onSuccess: (data) => {
+          router.push(`${data.url}`);
+        },
+      }
+    );
+  }
+
   console.log(cartQuery.data);
 
   return (
@@ -141,7 +163,7 @@ const Dashboard = () => {
             0
           )}
         </div>
-        <button>Checkout</button>
+        <button onClick={() => checkout()}>Checkout</button>
       </div>
 
       <div>

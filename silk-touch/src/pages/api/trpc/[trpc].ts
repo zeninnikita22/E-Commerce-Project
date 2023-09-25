@@ -6,6 +6,8 @@ import prisma from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
 import { error } from "console";
 
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 const appRouter = router({
   ///
   /// Fetching items ///
@@ -393,6 +395,44 @@ const appRouter = router({
         });
       } catch (error) {
         console.error("Error deleting an item", error);
+      }
+    }),
+
+  ///
+  /// Stripe checkout session requests ///
+  ///
+
+  createCheckoutSession: publicProcedure
+    .input(
+      z.object({
+        cartItems: z.array(
+          z.object({
+            priceIdStrapi: z.string(),
+            quantity: z.number(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const cartItems = input.cartItems;
+      console.log(cartItems);
+      try {
+        // Create Checkout Sessions from body params.
+        const session = await stripe.checkout.sessions.create({
+          line_items: cartItems.map((item) => {
+            return {
+              price: item.priceIdStrapi,
+              quantity: item.quantity,
+            };
+          }),
+          mode: "payment",
+          success_url: `http://localhost:3000/?success=true`,
+          cancel_url: `http://localhost:3000/?canceled=true`,
+        });
+        return session;
+        // res.redirect(303, session.url);
+      } catch (error) {
+        throw new Error("Error!");
       }
     }),
 });

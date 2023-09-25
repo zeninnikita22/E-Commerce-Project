@@ -23,6 +23,7 @@ model Item {
   title     String
   content   String?
   price Int @default(0)
+  priceIdStrapi String @default("")
   category    String  @default("")
   subcategory String  @default("")
   published Boolean @default(false)
