@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CartIcon from "./CartIcon";
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
@@ -6,8 +6,12 @@ import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
+import { loadStripe } from "@stripe/stripe-js";
 
 const Dashboard = () => {
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  );
   const { isLoaded, isSignedIn, user } = useUser();
   const decreaseCartItemQuantityMutation = trpc.decreaseCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();

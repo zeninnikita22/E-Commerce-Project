@@ -426,8 +426,8 @@ const appRouter = router({
             };
           }),
           mode: "payment",
-          success_url: `http://localhost:3000/?success=true`,
-          cancel_url: `http://localhost:3000/?canceled=true`,
+          success_url: `http://localhost:3000/`,
+          cancel_url: `http://localhost:3000/`,
         });
         return session;
         // res.redirect(303, session.url);
