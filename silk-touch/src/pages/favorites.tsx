@@ -48,7 +48,6 @@ export default function Favorites() {
           );
         })}
       </div>
-      <h1>List of products in your favorites:</h1>
     </div>
   );
 }
