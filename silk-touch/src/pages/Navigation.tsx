@@ -3,22 +3,24 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/router";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { useState } from "react";
 import Search from "./Search";
+import Dashboard from "./Dashboard";
 
 const navigation = [
-  { name: "Shop All", href: "#", current: true },
-  { name: "New", href: "#", current: false },
-  { name: "Sale", href: "#", current: false },
-  { name: "About Us", href: "#", current: false },
+  { name: "New", href: "/new", current: false },
+  { name: "Sale", href: "/sale", current: false },
+  { name: "About Us", href: "/about", current: false },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Navigation({ openDashboard, setOpenDashboard }) {
+export default function Navigation() {
+  const [openDashboard, setOpenDashboard] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const router = useRouter();
 
@@ -26,15 +28,12 @@ export default function Navigation({ openDashboard, setOpenDashboard }) {
     router.push("/favorites");
   };
 
-  const handleUserButtonClick = () => {
-    const clerkButton = document.getElementById("clerk-sign-in-button");
-    if (clerkButton) {
-      clerkButton.click();
-    }
-  };
-
   return (
     <>
+      <Dashboard
+        openDashboard={openDashboard}
+        setOpenDashboard={setOpenDashboard}
+      />
       <Disclosure as="nav" className="bg-gray-800">
         {({ open }) => (
           <>
@@ -64,6 +63,69 @@ export default function Navigation({ openDashboard, setOpenDashboard }) {
                   {/* Menu navbar items */}
                   <div className="hidden sm:ml-6 sm:block">
                     <div className="flex space-x-4">
+                      {/* Menu navbar item - Shop All with dropdown */}
+                      <div>
+                        <Menu
+                          as="div"
+                          className="relative inline-block text-left"
+                        >
+                          <div>
+                            <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                              Shop All
+                              <ChevronDownIcon
+                                className="-mr-1 h-5 w-5 text-gray-400"
+                                aria-hidden="true"
+                              />
+                            </Menu.Button>
+                          </div>
+
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <div className="py-1">
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <a
+                                      href="#"
+                                      className={classNames(
+                                        active
+                                          ? "bg-gray-100 text-gray-900"
+                                          : "text-gray-700",
+                                        "block px-4 py-2 text-sm"
+                                      )}
+                                    >
+                                      Pillows & blankets
+                                    </a>
+                                  )}
+                                </Menu.Item>
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <a
+                                      href="#"
+                                      className={classNames(
+                                        active
+                                          ? "bg-gray-100 text-gray-900"
+                                          : "text-gray-700",
+                                        "block px-4 py-2 text-sm"
+                                      )}
+                                    >
+                                      Bedding
+                                    </a>
+                                  )}
+                                </Menu.Item>
+                              </div>
+                            </Menu.Items>
+                          </Transition>
+                        </Menu>
+                      </div>
+                      {/* Menu navbar items - others */}
                       {navigation.map((item) => (
                         <a
                           key={item.name}
@@ -107,30 +169,10 @@ export default function Navigation({ openDashboard, setOpenDashboard }) {
                       </svg>
                     </button>
                     {/* Clerk profile */}
-                    <button
-                      type="button"
-                      className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                      onClick={handleUserButtonClick}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <UserButton
-                          afterSignOutUrl="/"
-                          id="clerk-sign-in-button"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
+                    <button>
+                      <UserButton afterSignOutUrl="/" />
                     </button>
+
                     {/* Favorites */}
                     <button
                       onClick={redirectToFavorites}

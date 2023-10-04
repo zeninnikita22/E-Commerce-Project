@@ -12,7 +12,6 @@ import { useUser } from "@clerk/nextjs";
 import Search from "./Search";
 
 export default function Home() {
-  const [openDashboard, setOpenDashboard] = useState(false);
   // const [searchInput, setSearchInput] = useState("");
   const [sortInput, setSortInput] = useState("");
   const { isLoaded, isSignedIn, user } = useUser();
@@ -95,16 +94,12 @@ export default function Home() {
   return (
     <div class="bg-white">
       <div class="mx-auto">
-        <Navigation
+        {/* <Navigation
           openDashboard={openDashboard}
           setOpenDashboard={setOpenDashboard}
-        />
+        /> */}
         {/* <Search searchInput={searchInput} setSearchInput={setSearchInput} /> */}
         <div>Hello, {user.id} welcome to Clerk</div>
-        <Dashboard
-          openDashboard={openDashboard}
-          setOpenDashboard={setOpenDashboard}
-        />
         <Sort sortInput={sortInput} setSortInput={setSortInput} />
         {/* osoznanno peresmotri cod! */}
         <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
