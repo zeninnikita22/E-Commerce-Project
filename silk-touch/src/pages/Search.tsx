@@ -23,7 +23,7 @@ const Search = () => {
   });
 
   function addToCart(item) {
-    const cartElement = cartQuery.data.find(
+    const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
     addItemToCartMutation.mutate(
@@ -43,7 +43,7 @@ const Search = () => {
   }
 
   function changeFavorites(item) {
-    const favoritesElement = favoritesQuery.data.find(
+    const favoritesElement = favoritesQuery.data?.find(
       (element) => element.itemId === item.id
     );
     console.log(favoritesQuery.data);
@@ -64,6 +64,7 @@ const Search = () => {
   }
 
   function findItem(value) {
+    console.log("finditem", value);
     setSearchInput(value);
     // const searchedItems = itemsQuery.data.filter((item) => {
     //   return (
@@ -82,7 +83,6 @@ const Search = () => {
         value={searchInput}
         onChange={(e) => findItem(e.target.value)}
       ></input>
-
       <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
         {itemsQuery.data?.length === 0
           ? "..."
@@ -94,7 +94,7 @@ const Search = () => {
                   searchInput &&
                   item &&
                   item.title &&
-                  item.title.toLowerCase().includes(searchInput)
+                  item.title.toLowerCase().includes(searchInput.toLowerCase())
               )
               .map((item) => {
                 return (

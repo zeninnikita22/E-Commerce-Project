@@ -1,15 +1,12 @@
-import Login from "./Login";
-import Register from "./Register";
 import Dashboard from "./Dashboard";
+import Categories from "./Categories";
 import Sort from "./Sort";
-import Navigation from "./Navigation";
 import { useState } from "react";
 import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
-import Search from "./Search";
 
 export default function Home() {
   // const [searchInput, setSearchInput] = useState("");
@@ -94,12 +91,7 @@ export default function Home() {
   return (
     <div class="bg-white">
       <div class="mx-auto">
-        {/* <Navigation
-          openDashboard={openDashboard}
-          setOpenDashboard={setOpenDashboard}
-        /> */}
-        {/* <Search searchInput={searchInput} setSearchInput={setSearchInput} /> */}
-        <div>Hello, {user.id} welcome to Clerk</div>
+        <Categories />
         <Sort sortInput={sortInput} setSortInput={setSortInput} />
         {/* osoznanno peresmotri cod! */}
         <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
