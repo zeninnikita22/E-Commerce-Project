@@ -1,4 +1,5 @@
 import Navigation from "./Navigation";
+import Footer from "./Footer";
 
 const Layout = ({ children }) => {
   return (
@@ -8,7 +9,7 @@ const Layout = ({ children }) => {
       // setOpenDashboard={setOpenDashboard}
       />
       <main>{children}</main>
-      <footer>Footer Content</footer>
+      <Footer />
     </div>
   );
 };

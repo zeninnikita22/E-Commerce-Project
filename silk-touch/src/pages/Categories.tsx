@@ -29,16 +29,6 @@ export default function Categories() {
 
   return (
     <>
-      {/* {categories.map((category) => {
-        <div>
-          <p>Blah</p>
-          <CategoryCard
-            imageUrl={category.imageSrc}
-            title={category.name}
-            categoryPage={category.href}
-          />
-        </div>;
-      })} */}
       <div className="bg-gray-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl py-10 sm:py-10 lg:max-w-none lg:py-10">

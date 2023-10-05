@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import AboutUsCard from "./AboutUsCard";
 
 export default function Home() {
   // const [searchInput, setSearchInput] = useState("");
@@ -155,6 +156,7 @@ export default function Home() {
                   );
                 })}
         </div>
+        <AboutUsCard />
       </div>
     </div>
   );
