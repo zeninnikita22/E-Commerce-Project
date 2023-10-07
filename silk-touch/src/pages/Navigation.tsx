@@ -4,6 +4,9 @@ import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import React from "react";
+import { trpc } from "./utils/trpc";
+import { useUser } from "@clerk/nextjs";
 
 import { useState } from "react";
 import Search from "./Search";
@@ -12,6 +15,7 @@ import Dashboard from "./Dashboard";
 import Image from "next/image";
 import Logo from "../../public/Logo.png";
 import UserIcon from "../../public/user.png";
+import Link from "next/link";
 
 const navigation = [
   { name: "New", href: "/new", current: false },
@@ -24,8 +28,13 @@ function classNames(...classes) {
 }
 
 export default function Navigation() {
+  const [iconIsHovered, setIconIsHovered] = useState(false);
   const [openDashboard, setOpenDashboard] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { isLoaded, isSignedIn, user } = useUser();
+  const cartQuery = trpc.getCartItems.useQuery({
+    userId: user?.id,
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -85,12 +94,14 @@ export default function Navigation() {
                 <div className="flex flex-1 items-center justify-between sm:items-stretch sm:justify-between">
                   {/* Logo navbar item */}
                   <div className="flex flex-shrink-0 items-center">
-                    <Image
-                      src="/Logo.png"
-                      alt="Site Logo"
-                      width={150}
-                      height={50}
-                    />
+                    <Link href="/">
+                      <Image
+                        src="/Logo.png"
+                        alt="Site Logo"
+                        width={150}
+                        height={50}
+                      />
+                    </Link>
                   </div>
                   {/* Menu navbar items */}
                   <div className="flex">
@@ -102,12 +113,25 @@ export default function Navigation() {
                             as="div"
                             className="relative inline-block text-left"
                           >
-                            <div>
-                              <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 px-3 py-2 font-quicksand text-sm text-black hover:text-pistachio">
+                            <div
+                              onMouseEnter={() => setIconIsHovered(true)}
+                              onMouseLeave={() => setIconIsHovered(false)}
+                            >
+                              <Menu.Button
+                                className={`inline-flex items-center w-full justify-center gap-x-1.5 px-3 py-2 font-quicksand text-sm font-medium ${
+                                  iconIsHovered
+                                    ? "text-pistachio"
+                                    : "text-black"
+                                } transition-colors duration-300 ease-in-out`}
+                              >
                                 Shop All
                                 {/* Issue with hovering both of them !!!!!*/}
                                 <ChevronDownIcon
-                                  className="-mr-1 h-5 w-5 text-black hover:text-pistachio"
+                                  className={`-mr-1 h-5 w-5 ${
+                                    iconIsHovered
+                                      ? "text-pistachio"
+                                      : "text-black"
+                                  } transition-colors duration-300 ease-in-out`}
                                   aria-hidden="true"
                                 />
                               </Menu.Button>
@@ -122,7 +146,7 @@ export default function Navigation() {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0 scale-95"
                             >
-                              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <Menu.Items className="absolute right-0 z-10 mt-4 w-56 origin-top-right rounded-md bg-off-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div className="py-1">
                                   <Menu.Item>
                                     {({ active }) => (
@@ -130,7 +154,7 @@ export default function Navigation() {
                                         href="#"
                                         className={classNames(
                                           active
-                                            ? "bg-gray-100 text-black font-quicksand"
+                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
                                             : "text-black",
                                           "block px-4 py-2 text-sm"
                                         )}
@@ -145,7 +169,7 @@ export default function Navigation() {
                                         href="#"
                                         className={classNames(
                                           active
-                                            ? "bg-gray-100 text-black font-quicksand"
+                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
                                             : "text-black",
                                           "block px-4 py-2 text-sm"
                                         )}
@@ -164,7 +188,7 @@ export default function Navigation() {
                           <a
                             key={item.name}
                             href={item.href}
-                            className="text-black font-quicksand hover:text-pistachio rounded-md px-3 py-2 text-sm"
+                            className="text-black font-quicksand font-medium  hover:text-pistachio transition-colors duration-300 ease-in-out rounded-md px-3 py-2 text-sm"
                           >
                             {item.name}
                           </a>
@@ -179,7 +203,7 @@ export default function Navigation() {
                           setSearchOpen(!searchOpen);
                         }}
                         type="button"
-                        className="relative rounded-full bg-off-white px-2 text-black hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        className="relative bg-off-white px-2 text-black hover:text-pistachio transition-colors duration-300 ease-in-out"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +245,7 @@ export default function Navigation() {
                       <button
                         onClick={redirectToFavorites}
                         type="button"
-                        className="relative rounded-full bg-off-white px-2 text-black hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        className="relative bg-off-white px-2 text-black hover:text-pistachio transition-colors duration-300 ease-in-out"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +268,7 @@ export default function Navigation() {
                           setOpenDashboard(!openDashboard);
                         }}
                         type="button"
-                        className="relative rounded-full bg-off-white px-2 text-black hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                        className="relative bg-off-white px-2 text-black hover:text-pistachio transition-colors duration-300 ease-in-out"
                       >
                         <svg
                           className="h-6 w-6"
@@ -260,6 +284,28 @@ export default function Navigation() {
                             d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
                           />
                         </svg>
+                        {cartQuery.data?.reduce((totalQuantity, cartItem) => {
+                          return totalQuantity + cartItem.quantity;
+                        }, 0) > 0 ? (
+                          <div className="absolute top-0 right-0 transform translate-x-0.5 -translate-y-1/2 bg-pistachio rounded-full w-4 h-4 flex items-center justify-center text-black font-semibold text-xs">
+                            {cartQuery.data?.reduce(
+                              (totalQuantity, cartItem) => {
+                                return totalQuantity + cartItem.quantity;
+                              },
+                              0
+                            )}
+                          </div>
+                        ) : null}
+                        {/* {cartItemsCount > 0 && (
+                          <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-pistachio rounded-full w-5 h-5 flex items-center justify-center text-black text-xs">
+                            {cartQuery.data?.reduce(
+                              (totalQuantity, cartItem) => {
+                                return totalQuantity + cartItem.quantity;
+                              },
+                              0
+                            )}
+                          </div>
+                        )} */}
                       </button>
                     </div>
                   </div>
