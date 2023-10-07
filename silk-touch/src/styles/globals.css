@@ -18,6 +18,10 @@ body {
 .cl-userButtonAvatarImage {
   background-color: #faf9f6;
 }
+
+.w-30 {
+  width: 30%;
+}
 /* :root {
   font-family: "Quicksand";
 } */

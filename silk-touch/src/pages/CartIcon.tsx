@@ -14,7 +14,6 @@ const CartIcon = () => {
   return (
     <>
       <div>
-        NUMBER
         {cartQuery.data?.reduce((totalQuantity, cartItem) => {
           return totalQuantity + cartItem.quantity;
         }, 0)}
