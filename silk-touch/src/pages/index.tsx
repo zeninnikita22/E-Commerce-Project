@@ -90,12 +90,12 @@ export default function Home() {
   // }
 
   return (
-    <div class="bg-white">
-      <div class="mx-auto">
+    <div className="bg-off-white">
+      <div className="mx-auto">
         <Categories />
         <Sort sortInput={sortInput} setSortInput={setSortInput} />
         {/* osoznanno peresmotri cod! */}
-        <div class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
           {" "}
           {itemsQuery.data?.length === 0
             ? "..."
@@ -121,33 +121,33 @@ export default function Home() {
                   return (
                     <div key={item.id}>
                       <div>
-                        <a href="#" class="group">
-                          <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                        <a href="#" className="group">
+                          <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                             <img
                               src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
                               alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                              class="h-full w-full object-cover object-center group-hover:opacity-75"
+                              className="h-full w-full object-cover object-center group-hover:opacity-75"
                             />
                           </div>
-                          <h3 class="mt-4 text-sm text-gray-700">
+                          <h3 className="mt-4 text-sm text-gray-700">
                             {item.title}
                           </h3>
-                          <p class="mt-1 text-lg font-medium text-gray-900">
+                          <p className="mt-1 text-lg font-medium text-gray-900">
                             ${item.price}
                           </p>
                         </a>
-                        <p class="mt-1 text-sm font-medium text-gray-300">
+                        <p className="mt-1 text-sm font-medium text-gray-300">
                           {item.content}
                         </p>
                         <button
                           onClick={() => addToCart(item)}
-                          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
                           Add to cart
                         </button>
                         <button
                           onClick={() => changeFavorites(item)}
-                          class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
                         >
                           Add to favorites
                         </button>

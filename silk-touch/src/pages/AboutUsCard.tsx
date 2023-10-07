@@ -3,9 +3,9 @@ import Link from "next/link";
 
 const AboutUsCard = () => {
   return (
-    <div className="flex w-full h-96 border border-gray-300 overflow-hidden">
-      <div className="flex flex-col justify-center items-start p-8 w-1/2">
-        <h1 className="text-4xl mb-4">About us</h1>
+    <div className="flex w-full h-96 overflow-hidden">
+      <div className="flex flex-col justify-center items-start bg-pistachio text-night p-8 w-1/2">
+        <h1 className="font-raleway text-4xl mb-4">About us</h1>
         <p className="mb-6">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus //
           illum vitae et unde inventore excepturi totam nulla eos deserunt //
