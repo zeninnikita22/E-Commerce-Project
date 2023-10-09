@@ -10,7 +10,7 @@ import { useUser } from "@clerk/nextjs";
 
 import { useState } from "react";
 import Search from "./Search";
-import Dashboard from "./Dashboard";
+import ShoppingCart from "./ShoppingCart";
 
 import Image from "next/image";
 import Logo from "../../public/Logo.png";
@@ -29,7 +29,7 @@ function classNames(...classes) {
 
 export default function Navigation() {
   const [iconIsHovered, setIconIsHovered] = useState(false);
-  const [openDashboard, setOpenDashboard] = useState(false);
+  const [openShoppingCart, setOpenShoppingCart] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
   const cartQuery = trpc.getCartItems.useQuery({
@@ -70,9 +70,9 @@ export default function Navigation() {
 
   return (
     <>
-      <Dashboard
-        openDashboard={openDashboard}
-        setOpenDashboard={setOpenDashboard}
+      <ShoppingCart
+        openShoppingCart={openShoppingCart}
+        setOpenShoppingCart={setOpenShoppingCart}
       />
       <Disclosure as="nav" className="bg-off-white border-b text-black">
         {({ open }) => (
@@ -265,7 +265,7 @@ export default function Navigation() {
                       {/* Cart */}
                       <button
                         onClick={() => {
-                          setOpenDashboard(!openDashboard);
+                          setOpenShoppingCart(!openShoppingCart);
                         }}
                         type="button"
                         className="relative bg-off-white px-2 text-black hover:text-pistachio transition-colors duration-300 ease-in-out"

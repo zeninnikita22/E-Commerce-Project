@@ -9,7 +9,12 @@ const Footer = () => {
       <div className="container mx-auto flex flex-wrap justify-between items-start">
         {/* Left Side */}
         <div className="w-full md:w-3/5 mb-8 md:mb-0">
-          <Image src="/Logo.png" alt="Site Logo" width={150} height={50} />
+          <Image
+            src="/Logo-Black.png"
+            alt="Site Logo"
+            width={150}
+            height={50}
+          />
           <p className="mt-4 mb-6 text-gray-300">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>

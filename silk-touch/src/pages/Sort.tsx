@@ -15,20 +15,30 @@ const Sort = ({ sortInput, setSortInput }) => {
   }
 
   return (
-    <div class="inline-block relative w-64">
+    <div className="inline-block relative w-48 mt-6 ml-12">
       <select
         onChange={(e) => sortItems(e.target.value)}
-        class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+        className="block appearance-none w-full bg-off-white border transition-all transition-duration-500 border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
       >
-        <option value="">Sort</option>
-        <option value="nameAZ">Name: A-Z</option>
-        <option value="nameZA">Name: Z-A</option>
-        <option value="priceLH">Price: Low to High</option>
-        <option value="priceHL">Price: High to Low</option>
+        <option value="" className="">
+          Sort by
+        </option>
+        <option value="nameAZ" className="">
+          Name: A-Z
+        </option>
+        <option value="nameZA" className="">
+          Name: Z-A
+        </option>
+        <option value="priceLH" className="">
+          Price: Low to High
+        </option>
+        <option value="priceHL" className="">
+          Price: High to Low
+        </option>
       </select>
-      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
         <svg
-          class="fill-current h-4 w-4"
+          className="fill-current h-4 w-4"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
         >

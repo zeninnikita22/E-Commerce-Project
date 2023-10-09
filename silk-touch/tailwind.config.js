@@ -12,6 +12,7 @@ module.exports = {
       quicksand: ["Quicksand", "sans-serif"],
       raleway: ["Raleway", "sans-serif"],
       josefin: ["Josefin Sans", "sans-serif"],
+      roboto: ["Roboto", "sans-serif"],
     },
     extend: {
       backgroundImage: {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import CartIcon from "./CartIcon";
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
@@ -11,7 +10,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-const Dashboard = ({ openDashboard, setOpenDashboard }) => {
+const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   );
@@ -30,7 +29,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   const router = useRouter();
 
   function addToCart(element) {
-    const cartElement = cartQuery.data.find(
+    const cartElement = cartQuery.data?.find(
       (element) => element.itemId === element.item.id
     );
     addItemToCartMutation.mutate(
@@ -50,7 +49,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   }
 
   function decreaseItemQuantity(element) {
-    const cartElement = cartQuery.data.find(
+    const cartElement = cartQuery.data?.find(
       (element) => element.itemId === element.item.id
     );
     decreaseCartItemQuantityMutation.mutate(
@@ -70,7 +69,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   }
 
   function deleteFromCart(element) {
-    const cartElement = cartQuery.data.find(
+    const cartElement = cartQuery.data?.find(
       (element) => element.itemId === element.item.id
     );
     deleteItemFromCartMutation.mutate(
@@ -90,7 +89,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   }
 
   function changeItemQuantity({ e, element }) {
-    const cartElement = cartQuery.data.find(
+    const cartElement = cartQuery.data?.find(
       (element) => element.itemId === element.item.id
     );
     const quantityValue = e.target.value;
@@ -116,7 +115,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   }
 
   function checkout() {
-    const cartItems = cartQuery.data.map((cartItem) => ({
+    const cartItems = cartQuery.data?.map((cartItem) => ({
       quantity: cartItem.quantity,
       priceIdStrapi: cartItem.item.priceIdStrapi,
     }));
@@ -137,8 +136,12 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
 
   return (
     <>
-      <Transition.Root show={openDashboard} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={setOpenDashboard}>
+      <Transition.Root show={openShoppingCart} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={setOpenShoppingCart}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-in-out duration-500"
@@ -174,7 +177,7 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
                             <button
                               type="button"
                               className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
-                              onClick={() => setOpenDashboard(false)}
+                              onClick={() => setOpenShoppingCart(false)}
                             >
                               <span className="absolute -inset-0.5" />
                               <span className="sr-only">Close panel</span>
@@ -209,7 +212,9 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
                                             <a href="#">{element.item.title}</a>
                                           </h3>
                                           <p className="ml-4">
-                                            {element.item.price}
+                                            $
+                                            {element.item.price *
+                                              element.quantity}
                                           </p>
                                         </div>
                                         <p className="mt-1 text-sm text-gray-500">
@@ -217,54 +222,81 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
                                         </p>
                                       </div>
                                       <div className="flex flex-1 items-end justify-between text-sm">
-                                        <p className="text-gray-500">
+                                        {/* <p className="text-gray-500">
                                           Qty {element.quantity}
-                                        </p>
+                                        </p> */}
+                                        <div>
+                                          <button
+                                            onClick={() => addToCart(element)}
+                                            className="text-xs font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
+                                          >
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              fill="none"
+                                              viewBox="0 0 24 24"
+                                              stroke-width="1.5"
+                                              stroke="currentColor"
+                                              className="w-3 h-3"
+                                            >
+                                              <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M12 6v12m6-6H6"
+                                              />
+                                            </svg>
+                                          </button>
+                                          <input
+                                            className="appearance-none border p-1 text-center font-medium font-quicksand mx-4"
+                                            type="number"
+                                            min="0"
+                                            max="99"
+                                            value={
+                                              cartQuery.data?.filter(
+                                                (cartItem) =>
+                                                  cartItem.itemId ===
+                                                  element.item.id
+                                              )[0].quantity
+                                            }
+                                            onChange={(e) =>
+                                              changeItemQuantity({ e, element })
+                                            }
+                                          ></input>
+                                          <button
+                                            className="text-sm font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
+                                            onClick={() =>
+                                              decreaseItemQuantity(element)
+                                            }
+                                          >
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              fill="none"
+                                              viewBox="0 0 24 24"
+                                              strokeWidth={1.5}
+                                              stroke="currentColor"
+                                              className="w-3 h-3"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M18 12H6"
+                                              />
+                                            </svg>
+                                          </button>
+                                        </div>
 
                                         <div className="flex">
                                           <button
                                             type="button"
-                                            className="font-medium text-indigo-600 hover:text-indigo-500"
+                                            className="font-medium text-black hover:text-pistachio"
+                                            onClick={() =>
+                                              deleteFromCart(element)
+                                            }
                                           >
-                                            Remove
+                                            Delete
                                           </button>
                                         </div>
                                       </div>
                                     </div>
-                                    {/* <button onClick={() => addToCart(element)}>
-                                      +
-                                    </button>
-                                    <div>{element.item.title}</div>
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="99"
-                                      value={
-                                        cartQuery.data?.filter(
-                                          (cartItem) =>
-                                            cartItem.itemId === element.item.id
-                                        )[0].quantity
-                                      }
-                                      onChange={(e) =>
-                                        changeItemQuantity({ e, element })
-                                      }
-                                    ></input>
-                                    <div>{element.quantity}</div>
-                                    <div>
-                                      {element.item.price * element.quantity}
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        decreaseItemQuantity(element)
-                                      }
-                                    >
-                                      -
-                                    </button>
-                                    <button
-                                      onClick={() => deleteFromCart(element)}
-                                    >
-                                      DEL
-                                    </button> */}
                                   </li>
                                 );
                               })}
@@ -274,8 +306,8 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
                       </div>
 
                       <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                        <div className="flex justify-between text-base font-medium text-gray-900">
-                          $
+                        <div className="font-medium text-gray-900">
+                          Total: $
                           {cartQuery.data?.reduce(
                             (acc, item) =>
                               acc + item.item.price * item.quantity,
@@ -286,31 +318,12 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
                           Shipping and taxes calculated at checkout.
                         </p>
                         <div className="mt-6">
-                          {/* <a
-                            href="#"
-                            className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                          >
-                            Checkout
-                          </a> */}
                           <button
                             onClick={() => checkout()}
-                            className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                            className="flex items-center justify-center rounded-md transition-colors duration-400 border border-transparent bg-pistachio px-6 py-3 text-base font-medium text-black shadow-sm hover:bg-black hover:text-white"
                           >
                             Checkout
                           </button>
-                        </div>
-                        <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                          <p>
-                            or
-                            <button
-                              type="button"
-                              className="font-medium text-indigo-600 hover:text-indigo-500"
-                              onClick={() => setOpenDashboard(false)}
-                            >
-                              Continue Shopping
-                              <span aria-hidden="true"> &rarr;</span>
-                            </button>
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -325,4 +338,4 @@ const Dashboard = ({ openDashboard, setOpenDashboard }) => {
   );
 };
 
-export default Dashboard;
+export default ShoppingCart;
