@@ -5,7 +5,7 @@ import { UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import React from "react";
-import { trpc } from "./utils/trpc";
+import { trpc } from "../pages/utils/trpc";
 import { useUser } from "@clerk/nextjs";
 
 import { useState } from "react";

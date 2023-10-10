@@ -1,14 +1,14 @@
-import Dashboard from "./ShoppingCart";
-import Categories from "./Categories";
-import Sort from "./Sort";
+import Dashboard from "../components/ShoppingCart";
+import Categories from "../components/Categories";
+import Sort from "../components/Sort";
 import { useState } from "react";
 import { trpc } from "./utils/trpc";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
-import AboutUsCard from "./AboutUsCard";
-import Products from "./Products";
+import AboutUsCard from "../components/AboutUsCard";
+import Products from "../components/Products";
 
 export default function Home() {
   // const [searchInput, setSearchInput] = useState("");

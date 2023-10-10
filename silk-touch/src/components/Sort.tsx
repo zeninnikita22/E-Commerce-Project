@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { trpc } from "./utils/trpc";
+import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";

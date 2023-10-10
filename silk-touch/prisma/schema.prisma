@@ -8,34 +8,37 @@ datasource db {
 }
 
 model CartItem {
-  id       String     @id @default(uuid())
-  userId String @default("")
-  quantity Int @default(1)
-
-
-// this is foreign key
-  itemId Int
-  item Item @relation(fields: [itemId], references: [id])
+  id       String  @id @default(uuid())
+  userId   String  @default("")
+  quantity Int     @default(1)
+  itemId   Int
+  item     Item    @relation(fields: [itemId], references: [id])
 }
 
 model Item {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  price Int @default(0)
-  priceIdStrapi String @default("")
-  category    String  @default("")
-  subcategory String  @default("")
-  published Boolean @default(false)
-  cartitems CartItem[]
-  favorites Favorites[]
+  id          Int         @id @default(autoincrement())
+  title       String
+  content     String?
+  price       Int         @default(0)
+  priceIdStrapi String    @default("")
+  published   Boolean     @default(false)
+  categoryId  Int         @default(0)
+  category    Category   @relation(fields: [categoryId], references: [id]) 
+  cartitems   CartItem[]
+  favorites   Favorites[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+  items Item[]
 }
 
 model Favorites {
-  id        String     @id @default(uuid())
+  id      String @id @default(uuid())
   userId  String @default("")
-  item Item @relation(fields: [itemId], references: [id])
-  itemId Int
+  item    Item   @relation(fields: [itemId], references: [id])
+  itemId  Int
 }
 
 // const items = await prisma.items.findMany()

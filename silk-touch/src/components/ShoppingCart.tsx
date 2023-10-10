@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { trpc } from "./utils/trpc";
+import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
@@ -195,111 +195,122 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                               role="list"
                               className="-my-6 divide-y divide-gray-200"
                             >
-                              {cartQuery.data?.map((element) => {
-                                return (
-                                  <li key={element.id} className="flex py-6">
-                                    <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                      <img
-                                        src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
-                                        alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
-                                        className="h-full w-full object-cover object-center"
-                                      />
-                                    </div>
-                                    <div className="ml-4 flex flex-1 flex-col">
-                                      <div>
-                                        <div className="flex justify-between text-base font-medium text-gray-900">
-                                          <h3>
-                                            <a href="#">{element.item.title}</a>
-                                          </h3>
-                                          <p className="ml-4">
-                                            $
-                                            {element.item.price *
-                                              element.quantity}
+                              {cartQuery.data?.length == 0 ? (
+                                <p className="mt-6 text-gray-400">
+                                  Your cart is empty
+                                </p>
+                              ) : (
+                                cartQuery.data?.map((element) => {
+                                  return (
+                                    <li key={element.id} className="flex py-6">
+                                      <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                        <img
+                                          src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                                          alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                                          className="h-full w-full object-cover object-center"
+                                        />
+                                      </div>
+                                      <div className="ml-4 flex flex-1 flex-col">
+                                        <div>
+                                          <div className="flex justify-between text-base font-medium text-gray-900">
+                                            <h3>
+                                              <a href="#">
+                                                {element.item.title}
+                                              </a>
+                                            </h3>
+                                            <p className="ml-4">
+                                              $
+                                              {element.item.price *
+                                                element.quantity}
+                                            </p>
+                                          </div>
+                                          <p className="mt-1 text-sm text-gray-500">
+                                            {element.item.content}
                                           </p>
                                         </div>
-                                        <p className="mt-1 text-sm text-gray-500">
-                                          {element.item.content}
-                                        </p>
-                                      </div>
-                                      <div className="flex flex-1 items-end justify-between text-sm">
-                                        {/* <p className="text-gray-500">
-                                          Qty {element.quantity}
-                                        </p> */}
-                                        <div>
-                                          <button
-                                            onClick={() => addToCart(element)}
-                                            className="text-xs font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
-                                          >
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              fill="none"
-                                              viewBox="0 0 24 24"
-                                              stroke-width="1.5"
-                                              stroke="currentColor"
-                                              className="w-3 h-3"
+                                        <div className="flex flex-1 items-end justify-between text-sm">
+                                          {/* <p className="text-gray-500">
+                                        Qty {element.quantity}
+                                      </p> */}
+                                          <div>
+                                            <button
+                                              onClick={() => addToCart(element)}
+                                              className="text-xs font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
                                             >
-                                              <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M12 6v12m6-6H6"
-                                              />
-                                            </svg>
-                                          </button>
-                                          <input
-                                            className="appearance-none border p-1 text-center font-medium font-quicksand mx-4"
-                                            type="number"
-                                            min="0"
-                                            max="99"
-                                            value={
-                                              cartQuery.data?.filter(
-                                                (cartItem) =>
-                                                  cartItem.itemId ===
-                                                  element.item.id
-                                              )[0].quantity
-                                            }
-                                            onChange={(e) =>
-                                              changeItemQuantity({ e, element })
-                                            }
-                                          ></input>
-                                          <button
-                                            className="text-sm font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
-                                            onClick={() =>
-                                              decreaseItemQuantity(element)
-                                            }
-                                          >
-                                            <svg
-                                              xmlns="http://www.w3.org/2000/svg"
-                                              fill="none"
-                                              viewBox="0 0 24 24"
-                                              strokeWidth={1.5}
-                                              stroke="currentColor"
-                                              className="w-3 h-3"
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke-width="1.5"
+                                                stroke="currentColor"
+                                                className="w-3 h-3"
+                                              >
+                                                <path
+                                                  stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M12 6v12m6-6H6"
+                                                />
+                                              </svg>
+                                            </button>
+                                            <input
+                                              className="appearance-none border p-1 text-center font-medium font-quicksand mx-4"
+                                              type="number"
+                                              min="0"
+                                              max="99"
+                                              value={
+                                                cartQuery.data?.filter(
+                                                  (cartItem) =>
+                                                    cartItem.itemId ===
+                                                    element.item.id
+                                                )[0].quantity
+                                              }
+                                              onChange={(e) =>
+                                                changeItemQuantity({
+                                                  e,
+                                                  element,
+                                                })
+                                              }
+                                            ></input>
+                                            <button
+                                              className="text-sm font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
+                                              onClick={() =>
+                                                decreaseItemQuantity(element)
+                                              }
                                             >
-                                              <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M18 12H6"
-                                              />
-                                            </svg>
-                                          </button>
-                                        </div>
+                                              <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="w-3 h-3"
+                                              >
+                                                <path
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  d="M18 12H6"
+                                                />
+                                              </svg>
+                                            </button>
+                                          </div>
 
-                                        <div className="flex">
-                                          <button
-                                            type="button"
-                                            className="font-medium text-black hover:text-pistachio"
-                                            onClick={() =>
-                                              deleteFromCart(element)
-                                            }
-                                          >
-                                            Delete
-                                          </button>
+                                          <div className="flex">
+                                            <button
+                                              type="button"
+                                              className="font-medium text-black hover:text-pistachio"
+                                              onClick={() =>
+                                                deleteFromCart(element)
+                                              }
+                                            >
+                                              Delete
+                                            </button>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  </li>
-                                );
-                              })}
+                                    </li>
+                                  );
+                                })
+                              )}
                             </ul>
                           </div>
                         </div>
