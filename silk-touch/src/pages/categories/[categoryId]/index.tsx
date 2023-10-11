@@ -92,7 +92,7 @@ export default function Category({ category }) {
 
 export async function getStaticPaths() {
   const categories = await prisma.category.findMany();
-  console.log("getStaticPaths prisma", categories);
+  // console.log("getStaticPaths prisma", categories);
 
   const paths = categories.map((category) => ({
     params: { categoryId: category.id.toString() },
@@ -110,7 +110,7 @@ export async function getStaticProps({ params }) {
       items: true, // This line includes the items related to the category in the fetched data
     },
   });
-  console.log("GetStaticProps Category:", category);
+  // console.log("GetStaticProps Category:", category);
   if (!category) {
     return {
       notFound: true, // This will render a 404 page if no category with the given ID is found

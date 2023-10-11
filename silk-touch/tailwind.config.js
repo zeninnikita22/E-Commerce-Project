@@ -28,6 +28,7 @@ module.exports = {
         "off-white": "#FAF9F6",
         "pak-green": "#033A06",
         pistachio: "#B2D3C2",
+        madder: "#A41623",
       },
       textColor: {
         "floral-white": "#F8F2E9",
@@ -37,6 +38,7 @@ module.exports = {
         "off-white": "#FAF9F6",
         "pak-green": "#033A06",
         pistachio: "#B2D3C2",
+        madder: "#A41623",
       },
       borderColor: {
         "floral-white": "#F8F2E9",
