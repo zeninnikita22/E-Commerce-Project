@@ -3,8 +3,6 @@ import { publicProcedure, router } from "../../../server/trpc";
 import { z } from "zod";
 // import axios from "axios";
 import prisma from "../../../../lib/prisma";
-import bcrypt from "bcryptjs";
-import { error } from "console";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -15,6 +13,15 @@ const appRouter = router({
 
   getAllItems: publicProcedure.query(async () => {
     const data = await prisma.item.findMany();
+    return data;
+  }),
+
+  getAllCategoriesItems: publicProcedure.query(async () => {
+    const data = await prisma.category.findMany({
+      include: {
+        items: true,
+      },
+    });
     return data;
   }),
 

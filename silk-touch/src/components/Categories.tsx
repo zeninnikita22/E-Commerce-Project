@@ -1,7 +1,4 @@
 import Link from "next/link";
-// import bedding_category from "../../public/bedding_category.jpeg";
-// import pillows_category from "../../public/pillows1_category.webp";
-// import towels_category from "../../public/towel_category.webp";
 
 export default function Categories() {
   const categories = [
@@ -10,20 +7,20 @@ export default function Categories() {
       imageSrc: "/bedding2.jpg",
       imageAlt:
         "Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.",
-      href: "#",
+      href: "/categories/2",
     },
     {
       name: "Pillows & blankets",
       imageSrc: "/pillows1_category.jpg",
       imageAlt:
         "Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.",
-      href: "#",
+      href: "/categories/1",
     },
     {
       name: "Towels",
       imageSrc: "/towel_category.jpg",
       imageAlt: "Collection of four insulated travel bottles on wooden shelf.",
-      href: "#",
+      href: "/categories/3",
     },
   ];
 
@@ -45,12 +42,6 @@ export default function Categories() {
                   <Link href={category.href} passHref>
                     <div className="block h-full w-full absolute top-0 left-0 z-0"></div>
                   </Link>
-                  {/* 
-                  <Link href={category.href} passHref>
-                    <button className="absolute text-white bg-black px-4 py-2 bottom-5 left-1/2 transform -translate-x-1/2 z-10 transition-all hover:bg-gray-500">
-                      Shop Now
-                    </button>
-                  </Link> */}
                 </div>
               ))}
             </div>

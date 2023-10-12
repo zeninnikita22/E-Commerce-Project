@@ -35,6 +35,7 @@ export default function Navigation() {
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
   });
+  const categoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const router = useRouter();
 
   useEffect(() => {
@@ -67,6 +68,8 @@ export default function Navigation() {
   const redirectToFavorites = () => {
     router.push("/favorites");
   };
+
+  console.log("Categories", categoriesQuery.data);
 
   return (
     <>
@@ -148,10 +151,30 @@ export default function Navigation() {
                             >
                               <Menu.Items className="absolute right-0 z-10 mt-4 w-56 origin-top-right rounded-md bg-off-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <div className="py-1">
-                                  <Menu.Item>
+                                  {categoriesQuery.data?.map((item) => {
+                                    return (
+                                      <Menu.Item>
+                                        {({ active }) => (
+                                          <a
+                                            href={`/categories/${item.id}`}
+                                            className={classNames(
+                                              active
+                                                ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
+                                                : "text-black",
+                                              "block px-4 py-2 text-sm"
+                                            )}
+                                          >
+                                            {item.name.charAt(0).toUpperCase() +
+                                              item.name.slice(1)}
+                                          </a>
+                                        )}
+                                      </Menu.Item>
+                                    );
+                                  })}
+                                  {/* <Menu.Item>
                                     {({ active }) => (
                                       <a
-                                        href="#"
+                                        href="/categories/2"
                                         className={classNames(
                                           active
                                             ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
@@ -166,7 +189,7 @@ export default function Navigation() {
                                   <Menu.Item>
                                     {({ active }) => (
                                       <a
-                                        href="#"
+                                        href="/categories/1"
                                         className={classNames(
                                           active
                                             ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
@@ -178,6 +201,21 @@ export default function Navigation() {
                                       </a>
                                     )}
                                   </Menu.Item>
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <a
+                                        href="/categories/3"
+                                        className={classNames(
+                                          active
+                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
+                                            : "text-black",
+                                          "block px-4 py-2 text-sm"
+                                        )}
+                                      >
+                                        Towels
+                                      </a>
+                                    )}
+                                  </Menu.Item> */}
                                 </div>
                               </Menu.Items>
                             </Transition>

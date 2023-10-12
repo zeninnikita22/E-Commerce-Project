@@ -2,6 +2,7 @@ import { trpc } from "../../utils/trpc";
 import { useUser } from "@clerk/nextjs";
 import prisma from "../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 export default function Category({ category }) {
   const queryClient = useQueryClient();
@@ -47,7 +48,10 @@ export default function Category({ category }) {
             return (
               <div key={item.id}>
                 <div className="flex flex-col items-center">
-                  <a href="#" className="group flex justify-center">
+                  <Link
+                    href={`${category.id}/products/${item.id}`}
+                    className="group flex justify-center"
+                  >
                     <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                       <img
                         src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
@@ -55,7 +59,7 @@ export default function Category({ category }) {
                         className="h-full w-full object-cover object-center group-hover:opacity-75"
                       />
                     </div>
-                  </a>
+                  </Link>
                   <h1 className="mt-4 font-medium font-raleway text-black">
                     {item.title.toUpperCase()}
                   </h1>
@@ -72,12 +76,6 @@ export default function Category({ category }) {
                   >
                     Add to cart
                   </button>
-                  {/* <button
-                  onClick={() => changeFavorites(item)}
-                  className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-                >
-                  Add to favorites
-                </button> */}
                 </div>
               </div>
             );

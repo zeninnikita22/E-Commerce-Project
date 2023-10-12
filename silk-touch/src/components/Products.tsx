@@ -8,9 +8,8 @@ import { useUser } from "@clerk/nextjs";
 const Products = ({ sortInput }) => {
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
+  // const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-  const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
-  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
   const { isLoaded, isSignedIn, user } = useUser();
 
   const cartQuery = trpc.getCartItems.useQuery({
@@ -73,7 +72,10 @@ const Products = ({ sortInput }) => {
                 return (
                   <div key={item.id}>
                     <div className="flex flex-col items-center">
-                      <a href="#" className="group flex justify-center">
+                      <a
+                        href={`/categories/${item.categoryId}/products/${item.id}`}
+                        className="group flex justify-center"
+                      >
                         <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                           <img
                             src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
@@ -98,12 +100,6 @@ const Products = ({ sortInput }) => {
                       >
                         Add to cart
                       </button>
-                      {/* <button
-                            onClick={() => changeFavorites(item)}
-                            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-                          >
-                            Add to favorites
-                          </button> */}
                     </div>
                   </div>
                 );
