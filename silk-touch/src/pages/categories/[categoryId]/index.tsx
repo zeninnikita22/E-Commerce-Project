@@ -8,7 +8,7 @@ export default function Category({ category }) {
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const { isLoaded, isSignedIn, user } = useUser();
-
+  // console.log(category);
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
   });
@@ -38,10 +38,25 @@ export default function Category({ category }) {
   }
 
   return (
-    // <div className="container mx-auto px-12 py-12">
-    //   <div className="grid grid-cols-1 gap-x-2 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-2"></div>
     <>
-      <h1>{category.name}</h1>
+      <div className="flex items-center mt-10 ml-12 text-sm">
+        <Link href={"/"}>Home</Link>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-3 h-3 mx-1"
+        >
+          <path
+            fillRule="evenodd"
+            d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <Link href={`/categories/${category.id}`}>
+          {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+        </Link>
+      </div>
       <div className="container mx-auto px-12 py-12">
         <div className="grid grid-cols-1 gap-x-2 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-2">
           {category.items.map((item) => {
@@ -81,8 +96,6 @@ export default function Category({ category }) {
             );
           })}
         </div>
-
-        {/* Render other details of the category */}
       </div>
     </>
   );

@@ -5,8 +5,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
-export default function Product({ product }) {
+export default function Product({ product, category }) {
   const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -73,6 +74,39 @@ export default function Product({ product }) {
 
   return (
     <div>
+      <div className="flex items-center mt-10 ml-12 text-sm">
+        <Link href={"/"}>Home</Link>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-3 h-3 mx-1"
+        >
+          <path
+            fillRule="evenodd"
+            d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <Link href={`/categories/${product.categoryId}`}>
+          {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+        </Link>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-3 h-3 mx-1"
+        >
+          <path
+            fillRule="evenodd"
+            d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <Link href={`/categories/${product.categoryId}/products/${product.id}`}>
+          {product.title.charAt(0).toUpperCase() + product.title.slice(1)}
+        </Link>
+      </div>
       <div className="flex p-10">
         <div style={{ width: "55%" }} className="grid grid-cols-2 gap-4">
           <img
