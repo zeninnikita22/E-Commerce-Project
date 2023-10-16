@@ -89,7 +89,12 @@ export default function Product({ product, category }) {
           />
         </svg>
         <Link href={`/categories/${product.categoryId}`}>
-          {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+          {category.name
+            .split("&")
+            .map((word, i) =>
+              i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+            )
+            .join(" & ")}
         </Link>
         <svg
           xmlns="http://www.w3.org/2000/svg"

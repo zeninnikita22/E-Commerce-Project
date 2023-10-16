@@ -26,12 +26,21 @@ model Item {
   category    Category   @relation(fields: [categoryId], references: [id]) 
   cartitems   CartItem[]
   favorites   Favorites[]
+  images      ItemImage[] // Relation to multiple images
+}
+
+model ItemImage { // New model to store multiple image URLs for each item
+  id        Int    @id @default(autoincrement())
+  url       String // Field to store the image URL
+  itemId    Int
+  item      Item   @relation(fields: [itemId], references: [id])
 }
 
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
   items Item[]
+  imageUrl String? // Field to store the category image URL
 }
 
 model Favorites {

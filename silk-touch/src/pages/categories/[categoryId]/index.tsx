@@ -54,7 +54,12 @@ export default function Category({ category }) {
           />
         </svg>
         <Link href={`/categories/${category.id}`}>
-          {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+          {category.name
+            .split("&")
+            .map((word, i) =>
+              i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+            )
+            .join(" & ")}
         </Link>
       </div>
       <div className="container mx-auto px-12 py-12">

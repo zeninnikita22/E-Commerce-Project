@@ -12,13 +12,24 @@ body {
 
 .cl-avatarImage {
   background-image: url("../../public/user.png");
-  background-size: cover; /* This will scale the image to cover the element */
-  background-position: center; /* Center the image within the element */
+  background-size: cover;
+  background-position: center;
+  /* border: 2px solid red; */
 }
 
 .cl-userButtonAvatarImage {
   background-color: #faf9f6;
 }
+
+/* .cl-avatarBox {
+  background-image: url("../../public/user.png");
+  background-size: cover; /* This will scale the image to cover the element */
+/* background-position: center; /* Center the image within the element */
+/* } */
+/* 
+.cl-userButtonAvatarBox {
+  background-color: #faf9f6;
+} */
 
 .w-30 {
   width: 30%;

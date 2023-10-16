@@ -164,58 +164,22 @@ export default function Navigation() {
                                               "block px-4 py-2 text-sm"
                                             )}
                                           >
-                                            {item.name.charAt(0).toUpperCase() +
-                                              item.name.slice(1)}
+                                            {item.name
+                                              .split("&")
+                                              .map((word, i) =>
+                                                i === 0
+                                                  ? word
+                                                      .charAt(0)
+                                                      .toUpperCase() +
+                                                    word.slice(1)
+                                                  : word
+                                              )
+                                              .join(" & ")}
                                           </a>
                                         )}
                                       </Menu.Item>
                                     );
                                   })}
-                                  {/* <Menu.Item>
-                                    {({ active }) => (
-                                      <a
-                                        href="/categories/2"
-                                        className={classNames(
-                                          active
-                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
-                                            : "text-black",
-                                          "block px-4 py-2 text-sm"
-                                        )}
-                                      >
-                                        Pillows & blankets
-                                      </a>
-                                    )}
-                                  </Menu.Item>
-                                  <Menu.Item>
-                                    {({ active }) => (
-                                      <a
-                                        href="/categories/1"
-                                        className={classNames(
-                                          active
-                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
-                                            : "text-black",
-                                          "block px-4 py-2 text-sm"
-                                        )}
-                                      >
-                                        Bedding
-                                      </a>
-                                    )}
-                                  </Menu.Item>
-                                  <Menu.Item>
-                                    {({ active }) => (
-                                      <a
-                                        href="/categories/3"
-                                        className={classNames(
-                                          active
-                                            ? "bg-pistachio text-black font-quicksand transition-colors duration-500 ease-in-out"
-                                            : "text-black",
-                                          "block px-4 py-2 text-sm"
-                                        )}
-                                      >
-                                        Towels
-                                      </a>
-                                    )}
-                                  </Menu.Item> */}
                                 </div>
                               </Menu.Items>
                             </Transition>
@@ -258,10 +222,7 @@ export default function Navigation() {
                           />
                         </svg>
                       </button>
-                      {/* Clerk profile */}
-                      <div>
-                        <UserButton afterSignOutUrl="/" />
-                      </div>
+
                       {/* <div id="customIcon" className="z-20 cursor-pointer">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -334,17 +295,11 @@ export default function Navigation() {
                             )}
                           </div>
                         ) : null}
-                        {/* {cartItemsCount > 0 && (
-                          <div className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-pistachio rounded-full w-5 h-5 flex items-center justify-center text-black text-xs">
-                            {cartQuery.data?.reduce(
-                              (totalQuantity, cartItem) => {
-                                return totalQuantity + cartItem.quantity;
-                              },
-                              0
-                            )}
-                          </div>
-                        )} */}
                       </button>
+                    </div>
+                    {/* Clerk profile */}
+                    <div className="ml-2">
+                      <UserButton afterSignOutUrl="/" />
                     </div>
                   </div>
                 </div>
