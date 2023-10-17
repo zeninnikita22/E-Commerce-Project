@@ -74,7 +74,7 @@ export default function Category({ category }) {
                   >
                     <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                       <img
-                        src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                        src={`${item.images[0].url}`}
                         alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                         className="h-full w-full object-cover object-center group-hover:opacity-75"
                       />
@@ -87,7 +87,7 @@ export default function Category({ category }) {
                     {item.content}
                   </p>
                   <p className="mt-3 text-base font-roboto font-medium text-black">
-                    $ {item.price}
+                    € {item.price}
                   </p>
 
                   <button
@@ -123,7 +123,11 @@ export async function getStaticProps({ params }) {
       id: parseInt(params.categoryId, 10), // Ensure to parse the ID as an integer, if it's stored as an integer in your database
     },
     include: {
-      items: true, // This line includes the items related to the category in the fetched data
+      items: {
+        include: {
+          images: true, // Include images associated with each item
+        },
+      },
     },
   });
   // console.log("GetStaticProps Category:", category);

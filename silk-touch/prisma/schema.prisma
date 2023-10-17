@@ -20,7 +20,7 @@ model Item {
   title       String
   content     String?
   price       Int         @default(0)
-  priceIdStrapi String    @default("")
+  priceIdStrapi String?    @default("")
   published   Boolean     @default(false)
   categoryId  Int         @default(0)
   category    Category   @relation(fields: [categoryId], references: [id]) 

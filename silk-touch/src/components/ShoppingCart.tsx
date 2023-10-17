@@ -205,7 +205,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                     <li key={element.id} className="flex py-6">
                                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                         <img
-                                          src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                                          src={`${element.item.images[0].url}`}
                                           alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                                           className="h-full w-full object-cover object-center"
                                         />
@@ -219,7 +219,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                               </a>
                                             </h3>
                                             <p className="ml-4">
-                                              $
+                                              €
                                               {element.item.price *
                                                 element.quantity}
                                             </p>

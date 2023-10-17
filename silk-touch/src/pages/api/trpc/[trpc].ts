@@ -12,14 +12,22 @@ const appRouter = router({
   ///
 
   getAllItems: publicProcedure.query(async () => {
-    const data = await prisma.item.findMany();
+    const data = await prisma.item.findMany({
+      include: {
+        images: true,
+      },
+    });
     return data;
   }),
 
   getAllCategoriesItems: publicProcedure.query(async () => {
     const data = await prisma.category.findMany({
       include: {
-        items: true,
+        items: {
+          include: {
+            images: true, // Include images associated with each item
+          },
+        },
       },
     });
     return data;
@@ -204,7 +212,11 @@ const appRouter = router({
       try {
         const result = await prisma.cartItem.findMany({
           where: { userId: input.userId },
-          include: { item: true },
+          include: {
+            item: {
+              include: { images: true },
+            },
+          },
         });
         return result;
         // Create a new cart item and associate it with the user

@@ -4,7 +4,7 @@ import Link from "next/link";
 const AboutUsCard = () => {
   return (
     <div className="flex w-full h-96 overflow-hidden">
-      <div className="flex flex-col justify-center items-start bg-pistachio text-night p-8 w-1/2">
+      <div className="flex flex-col justify-center items-start bg-pistachio text-night py-8 px-12 w-1/2">
         <h1 className="font-raleway text-4xl mb-4">About us</h1>
         <h3 className="mb-6">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus //
@@ -20,7 +20,7 @@ const AboutUsCard = () => {
       </div>
       <div className="w-1/2">
         <img
-          src="https://tailwindui.com/img/ecommerce-images/home-page-02-edition-03.jpg"
+          src="https://storage.googleapis.com/silk-touch/Images/About/Cotton.jpeg"
           alt="About Us"
           className="h-full w-full object-cover"
         />

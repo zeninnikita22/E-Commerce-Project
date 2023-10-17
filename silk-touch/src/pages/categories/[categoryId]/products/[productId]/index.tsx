@@ -65,9 +65,17 @@ export default function Product({ product, category }) {
     );
   }
 
-  // const [mainImage, setMainImage] = useState("");
-  console.log(favoritesQuery.data);
+  console.log(itemsQuery.data);
+  // // const [mainImage, setMainImage] = useState("");
+  // console.log(favoritesQuery.data);
   console.log(product);
+
+  const [selectedImage, setSelectedImage] = useState(product?.images[0]);
+
+  const handleHover = (image) => {
+    setSelectedImage(image);
+  };
+
   if (!product) {
     return <div>Product not found</div>;
   }
@@ -112,7 +120,87 @@ export default function Product({ product, category }) {
           {product.title.charAt(0).toUpperCase() + product.title.slice(1)}
         </Link>
       </div>
-      <div className="flex p-10">
+      <div className="flex p-10 space-x-8">
+        <div style={{ width: "45%" }}>
+          <img
+            style={{ objectFit: "cover", borderRadius: "10px" }}
+            className="w-full h-5/6 object-cover transition-transform duration-500 transform hover:scale-105"
+            src={`${selectedImage.url}`}
+            alt={product.title}
+          />
+        </div>
+
+        <div style={{ width: "55%" }} className="flex">
+          <div className="flex flex-col space-y-2 mr-8">
+            {product.images.map((image) => (
+              <img
+                key={image.id}
+                className="w-24 h-24 object-cover cursor-pointer transition-transform duration-500 transform hover:scale-105"
+                src={`${image.url}`}
+                alt={product.title}
+                onMouseOver={() => handleHover(image)}
+              />
+            ))}
+          </div>
+
+          <div>
+            <h1 className="text-3xl mb-2 font-medium font-raleway text-black">
+              {product.title}
+            </h1>
+            <p className="text-xl mb-5 text-base font-roboto font-medium text-black">
+              € {product.price}
+            </p>
+            <p className="mb-8 text-sm font-normal text-gray-500">
+              {product.content}
+            </p>
+
+            <div className="flex">
+              <button
+                onClick={() => addToCart(product)}
+                className="bg-pistachio text-black font-raleway font-light py-2 px-20 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100"
+              >
+                Add to cart
+              </button>
+
+              <button
+                onClick={() => changeFavorites(product)}
+                type="button"
+                className="relative bg-off-white px-3 py-1 ml-4 text-black transition-colors duration-300 ease-in-out border rounded-full hover:text-madder"
+              >
+                {favoritesQuery.data?.some(
+                  (element) => element.item.id === product.id
+                ) ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="#A41623"
+                    className="w-6 h-6"
+                  >
+                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="flex p-10">
         <div style={{ width: "55%" }} className="grid grid-cols-2 gap-4">
           <img
             className="w-full h-full object-cover"
@@ -195,7 +283,7 @@ export default function Product({ product, category }) {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
@@ -236,6 +324,9 @@ export async function getStaticProps({ params }) {
   const product = await prisma.item.findUnique({
     where: {
       id: parseInt(productId, 10), // Convert productId to a number
+    },
+    include: {
+      images: true,
     },
   });
 

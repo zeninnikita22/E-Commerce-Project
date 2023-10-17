@@ -4,8 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { UserButton } from "@clerk/nextjs";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/router";
 
 const Products = ({ sortInput }) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
   // const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
@@ -25,23 +27,30 @@ const Products = ({ sortInput }) => {
   console.log("cart", cartQuery.data);
 
   function addToCart(item) {
-    const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === item.id
-    );
-    addItemToCartMutation.mutate(
-      {
-        userId: user?.id,
-        itemId: item.id,
-        cartItemId: cartElement === undefined ? "" : cartElement?.id,
-      },
-      {
-        onSuccess: (data) => {
-          // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
+    if (!user) {
+      // Redirect to login and then back to the current page after login
+      const currentPath = encodeURIComponent(router.asPath);
+      router.push(`/sign-in?redirect=${currentPath}`);
+      return;
+    } else {
+      const cartElement = cartQuery.data?.find(
+        (element) => element.itemId === item.id
+      );
+      addItemToCartMutation.mutate(
+        {
+          userId: user?.id,
+          itemId: item.id,
+          cartItemId: cartElement === undefined ? "" : cartElement?.id,
         },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            // Invalidate specific queries after the mutation is successful
+            queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+            console.log("Add to cart OnSuccess", data);
+          },
+        }
+      );
+    }
   }
 
   return (
@@ -78,7 +87,7 @@ const Products = ({ sortInput }) => {
                       >
                         <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                           <img
-                            src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                            src={`${item.images[0].url}`}
                             alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                             className="h-full w-full object-cover object-center group-hover:opacity-75"
                           />
@@ -91,7 +100,7 @@ const Products = ({ sortInput }) => {
                         {item.content}
                       </p>
                       <p className="mt-3 text-base font-roboto font-medium text-black">
-                        $ {item.price}
+                        € {item.price}
                       </p>
 
                       <button

@@ -23,23 +23,29 @@ const Search = () => {
   });
 
   function addToCart(item) {
-    const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === item.id
-    );
-    addItemToCartMutation.mutate(
-      {
-        userId: user?.id,
-        itemId: item.id,
-        cartItemId: cartElement === undefined ? "" : cartElement?.id,
-      },
-      {
-        onSuccess: (data) => {
-          // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
+    if (!user) {
+      // If user is not logged in, redirect to login
+      router.push("/login");
+      return;
+    } else {
+      const cartElement = cartQuery.data?.find(
+        (element) => element.itemId === item.id
+      );
+      addItemToCartMutation.mutate(
+        {
+          userId: user?.id,
+          itemId: item.id,
+          cartItemId: cartElement === undefined ? "" : cartElement?.id,
         },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            // Invalidate specific queries after the mutation is successful
+            queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+            console.log("Add to cart OnSuccess", data);
+          },
+        }
+      );
+    }
   }
 
   function changeFavorites(item) {
@@ -105,7 +111,8 @@ const Search = () => {
                     >
                       <div className="overflow-hidden">
                         <img
-                          src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                          style={{ borderRadius: "10px" }}
+                          src={`${item.images[0].url}`}
                           alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                           className="h-40 w-40"
                         />
@@ -114,7 +121,7 @@ const Search = () => {
                         {item.title}
                       </h3>
                       <p className="mt-1 text-sm font-medium text-gray-700">
-                        ${item.price}
+                        €{item.price}
                       </p>
                     </a>
                   </div>
