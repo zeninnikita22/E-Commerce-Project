@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
+// import { UserButton } from "@clerk/nextjs";
+// import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
-const Sort = ({ sortInput, setSortInput }) => {
-  const { isLoaded, isSignedIn, user } = useUser();
+const Sort = ({ setSortInput }) => {
+  // const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
-  const itemsQuery = trpc.getAllItems.useQuery();
 
   function sortItems(value) {
     setSortInput(value);

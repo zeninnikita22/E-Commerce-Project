@@ -7,5 +7,10 @@ export default function Page() {
   // ? decodeURIComponent(router.query.redirect as string)
   //   : "/"; // Default redirection to home if no redirect query param
   // redirectUrl={redirectPath}
-  return <SignIn />;
+  return (
+    <>
+      Please sign in to proceed
+      <SignIn />
+    </>
+  );
 }

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
+// import { UserButton } from "@clerk/nextjs";
+// import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
 const Search = () => {
@@ -10,64 +10,6 @@ const Search = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
-  const addItemToCartMutation = trpc.addCartItem.useMutation();
-  const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
-  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
-
-  const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
-  });
-
-  const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: user?.id,
-  });
-
-  function addToCart(item) {
-    if (!user) {
-      // If user is not logged in, redirect to login
-      router.push("/login");
-      return;
-    } else {
-      const cartElement = cartQuery.data?.find(
-        (element) => element.itemId === item.id
-      );
-      addItemToCartMutation.mutate(
-        {
-          userId: user?.id,
-          itemId: item.id,
-          cartItemId: cartElement === undefined ? "" : cartElement?.id,
-        },
-        {
-          onSuccess: (data) => {
-            // Invalidate specific queries after the mutation is successful
-            queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-            console.log("Add to cart OnSuccess", data);
-          },
-        }
-      );
-    }
-  }
-
-  function changeFavorites(item) {
-    const favoritesElement = favoritesQuery.data?.find(
-      (element) => element.itemId === item.id
-    );
-    console.log(favoritesQuery.data);
-    changeFavoritesItemsMutation.mutate(
-      {
-        userId: user?.id,
-        itemId: item.id,
-        favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
-      },
-      {
-        onSuccess: (data) => {
-          // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
-          console.log("Add to favorites OnSuccess", data);
-        },
-      }
-    );
-  }
 
   function findItem(value) {
     console.log("finditem", value);

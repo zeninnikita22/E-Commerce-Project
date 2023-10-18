@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
+// import { UserButton } from "@clerk/nextjs";
+// import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 
@@ -10,7 +10,6 @@ const Products = ({ sortInput }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
-  // const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const { isLoaded, isSignedIn, user } = useUser();
 
@@ -22,9 +21,10 @@ const Products = ({ sortInput }) => {
     userId: user?.id,
   });
 
-  console.log("items", itemsQuery.data);
-  console.log("favorites", favoritesQuery.data);
-  console.log("cart", cartQuery.data);
+  // Logging out all the results of requests
+  // console.log("items", itemsQuery.data);
+  // console.log("favorites", favoritesQuery.data);
+  // console.log("cart", cartQuery.data);
 
   function addToCart(item) {
     if (!user) {

@@ -11,10 +11,12 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
+  const router = useRouter();
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   );
   const { isLoaded, isSignedIn, user } = useUser();
+
   const decreaseCartItemQuantityMutation = trpc.decreaseCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -23,10 +25,10 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
   const createCheckoutSessionMutation =
     trpc.createCheckoutSession.useMutation();
   const queryClient = useQueryClient();
+
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
   });
-  const router = useRouter();
 
   function addToCart(element) {
     const cartElement = cartQuery.data?.find(
@@ -92,26 +94,28 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === element.item.id
     );
-    const quantityValue = e.target.value;
-    if (quantityValue !== "") {
-      changeCartItemQuantityMutation.mutate(
-        {
-          userId: user?.id,
-          itemId: element.item.id,
-          cartItemId: cartElement === undefined ? "" : cartElement?.id,
-          quantity: Number(e.target.value),
-        },
-        {
-          onSuccess: (data) => {
-            // Invalidate specific queries after the mutation is successful
-            queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-            // console.log("Deleted item", data);
-          },
-        }
-      );
-    } else {
+    let quantityValue = e.target.value;
+
+    if (quantityValue === "") {
+      quantityValue = "0"; // Default value when the input is cleared
       console.log("No value!");
     }
+
+    changeCartItemQuantityMutation.mutate(
+      {
+        userId: user?.id,
+        itemId: element.item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
+        quantity: Number(quantityValue),
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+          // console.log("Deleted item", data);
+        },
+      }
+    );
   }
 
   function checkout() {
@@ -131,8 +135,6 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
       }
     );
   }
-
-  console.log(cartQuery.data);
 
   return (
     <>
@@ -253,9 +255,9 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                               </svg>
                                             </button>
                                             <input
-                                              className="appearance-none border p-1 text-center font-medium font-quicksand mx-4"
+                                              className="appearance-none border p-1 text-center font-medium font-quicksand mx-4 w-1/6"
                                               type="number"
-                                              min="0"
+                                              // min=""
                                               max="99"
                                               value={
                                                 cartQuery.data?.filter(

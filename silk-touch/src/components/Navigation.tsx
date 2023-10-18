@@ -1,19 +1,20 @@
+import React from "react";
 import { Fragment, useEffect } from "react";
+import { useState } from "react";
+
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { UserButton } from "@clerk/nextjs";
-import { useRouter } from "next/router";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import React from "react";
+
+import { useRouter } from "next/router";
 import { trpc } from "../pages/utils/trpc";
+
+import { UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
-import { useState } from "react";
 import Search from "./Search";
 import ShoppingCart from "./ShoppingCart";
-
 import Image from "next/image";
-import Logo from "../../public/Logo.png";
 import UserIcon from "../../public/user.png";
 import Link from "next/link";
 
@@ -222,24 +223,6 @@ export default function Navigation() {
                           />
                         </svg>
                       </button>
-
-                      {/* <div id="customIcon" className="z-20 cursor-pointer">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                          />
-                        </svg>
-                      </div> */}
-
                       {/* Favorites */}
                       <button
                         onClick={redirectToFavorites}

@@ -4,31 +4,6 @@ import { trpc } from "../pages/utils/trpc";
 export default function Categories() {
   const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
 
-  console.log(itemsCategoriesQuery.data);
-
-  const categories = [
-    {
-      name: "Bedding",
-      imageSrc: "/bedding2.jpg",
-      imageAlt:
-        "Desk with leather desk pad, walnut desk organizer, wireless keyboard and mouse, and porcelain mug.",
-      href: "/categories/2",
-    },
-    {
-      name: "Pillows & blankets",
-      imageSrc: "/pillows1_category.jpg",
-      imageAlt:
-        "Wood table with porcelain mug, leather journal, brass pen, leather key ring, and a houseplant.",
-      href: "/categories/1",
-    },
-    {
-      name: "Towels",
-      imageSrc: "/towel_category.jpg",
-      imageAlt: "Collection of four insulated travel bottles on wooden shelf.",
-      href: "/categories/3",
-    },
-  ];
-
   return (
     <>
       <div className="bg-off-white">

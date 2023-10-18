@@ -8,7 +8,6 @@ export default function Category({ category }) {
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const { isLoaded, isSignedIn, user } = useUser();
-  // console.log(category);
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
   });
