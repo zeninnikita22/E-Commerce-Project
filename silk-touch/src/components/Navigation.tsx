@@ -39,38 +39,11 @@ export default function Navigation() {
   const categoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const router = useRouter();
 
-  useEffect(() => {
-    const customIcon = document.getElementById("customIcon");
-    const clerkButton = document.querySelector("#clerkButtonContainer");
-
-    const handleClick = () => {
-      console.log("Custom icon clicked!");
-      if (clerkButton) {
-        console.log("Clerk button found, triggering click.");
-        (clerkButton as HTMLElement).click();
-      } else {
-        console.log("Clerk button not found.");
-      }
-    };
-
-    if (customIcon) {
-      customIcon.addEventListener("click", handleClick);
-    } else {
-      console.log("Custom icon not found.");
-    }
-
-    return () => {
-      if (customIcon) {
-        customIcon.removeEventListener("click", handleClick);
-      }
-    };
-  }, []);
-
   const redirectToFavorites = () => {
     router.push("/favorites");
   };
 
-  console.log("Categories", categoriesQuery.data);
+  // console.log("Categories", categoriesQuery.data);
 
   return (
     <>

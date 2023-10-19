@@ -115,8 +115,49 @@ export default function Admin() {
             <div>
               <form key={item.id} onSubmit={(e) => editItem(e, item.id)}>
                 <div>
+                  <div className="flex flex-col items-center">
+                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                      <img
+                        src={`${item.images[0].url}`}
+                        alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                        className="h-full w-full object-cover object-center group-hover:opacity-75"
+                      />
+                    </div>
+                    {/* <h1 className="mt-4 font-medium font-raleway text-black">
+                      {item.title.toUpperCase()}
+                    </h1>
+                    <p className="mt-2 text-xs font-medium text-black">
+                      {item.content}
+                    </p>
+                    <p className="mt-3 text-base font-roboto font-medium text-black">
+                      € {item.price}
+                    </p> */}
+
+                    {/* <button
+className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-20 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100"
+>
+Add to cart
+</button> */}
+                  </div>
                   <div>
-                    <div>{item.title}</div>
+                    <div>
+                      <h1 className="mt-4 font-medium font-raleway text-black">
+                        {item.title}
+                      </h1>
+                    </div>
+                    <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                      <img
+                        src={`${item.images[0].url}`}
+                        alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                        className="h-8 w-auto object-cover object-center group-hover:opacity-75"
+                      />
+                    </div>
+                    <p className="mt-2 text-xs font-medium text-black">
+                      {item.content}
+                    </p>
+                    <p className="mt-3 text-base font-roboto font-medium text-black">
+                      € {item.price}
+                    </p>
                     {editItemId === item.id ? (
                       <div>
                         <label htmlFor="title"> Title of item</label>
