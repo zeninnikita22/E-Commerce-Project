@@ -1,12 +1,12 @@
 import { trpc } from "../../../../utils/trpc";
-// import { useUser } from "@clerk/nextjs";
 import prisma from "../../../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Category, Item, ItemImage } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
+// import { useUserId } from "../../../../UserContext";
 
 export default function Product({
   product,
@@ -15,7 +15,56 @@ export default function Product({
   product: Item & { images: ReadonlyArray<ItemImage> };
   category: Category;
 }) {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isSignedIn, user } = useUser();
+  // const userId = useUserId();
+  // console.log(userId);
+  const [userId, setUserId] = useState("");
+
+  // let userId = "";
+
+  // function checkUserId() {
+  //   if (isSignedIn) {
+  //     userId = user.id;
+  //     console.log("User is signed in!");
+  //   } else {
+  //     let guestUserId = localStorage.getItem("guestUserId");
+
+  //     if (!guestUserId) {
+  //       guestUserId = uuidv4();
+  //       localStorage.setItem("guestUserId", guestUserId);
+  //       console.log(
+  //         "There is no guestId in local storage so we add it there",
+  //         guestUserId
+  //       );
+  //     } else {
+  //       userId = guestUserId;
+  //       console.log(
+  //         "User is not signed in, but there is a guestId in local storage",
+  //         guestUserId
+  //       );
+  //     }
+  //   }
+  // }
+
+  useEffect(() => {
+    // Function to update userId based on authentication status or local storage
+    const updateUserId = () => {
+      if (isSignedIn) {
+        return user.id;
+      } else {
+        let guestUserId = localStorage.getItem("guestUserId");
+        if (!guestUserId) {
+          guestUserId = uuidv4();
+          localStorage.setItem("guestUserId", guestUserId);
+        }
+        return guestUserId;
+      }
+    };
+
+    const currentUserId = updateUserId();
+    setUserId(currentUserId);
+  }, [isSignedIn, user]);
+
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   const [numberOfCartItems, setNumberOfCartItems] = useState(0);
@@ -23,21 +72,34 @@ export default function Product({
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
-  const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id as string,
-  });
+  const cartQuery = trpc.getCartItems.useQuery(
+    {
+      userId: userId,
+    }
+    // {
+    //   enabled: !!userId,
+    // }
+  );
 
-  const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: user?.id as string,
-  });
+  const favoritesQuery = trpc.getFavoritesItems.useQuery(
+    {
+      userId: userId,
+    }
+    // {
+    //   enabled: !!userId,
+    // }
+  );
 
   function addToCart(item: Item) {
+    // checkUserId();
+    console.log(cartQuery.data);
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
+
     addItemToCartMutation.mutate(
       {
-        userId: user?.id as string,
+        userId: userId,
         itemId: item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
@@ -52,13 +114,15 @@ export default function Product({
   }
 
   function changeFavorites(item: Item) {
+    // checkUserId();
+    console.log(userId);
     const favoritesElement = favoritesQuery.data?.find(
       (element) => element.itemId === item.id
     );
-    console.log(favoritesQuery.data);
+    // console.log(favoritesQuery.data); ---> UNDEFINED
     changeFavoritesItemsMutation.mutate(
       {
-        userId: user?.id as string,
+        userId: userId,
         itemId: item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
@@ -72,7 +136,7 @@ export default function Product({
     );
   }
 
-  console.log("ITEMS QUERY", itemsQuery.data);
+  // console.log("ITEMS QUERY", itemsQuery.data);
   // console.log(favoritesQuery.data);
   // console.log(product);
 

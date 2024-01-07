@@ -1,7 +1,7 @@
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: any) => {
   return (
     <div className="flex flex-col h-screen justify-between">
       <Navigation />

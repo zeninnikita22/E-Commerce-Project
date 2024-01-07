@@ -5,55 +5,70 @@ import { useQueryClient } from "@tanstack/react-query";
 // import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
+import { Item } from "@prisma/client";
 
 const Products = ({ sortInput }) => {
   const user = useUser();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const itemsQuery = trpc.getAllItems.useQuery(undefined, {
-    enabled: !!user.isSignedIn,
-  });
+  const itemsQuery = trpc.getAllItems.useQuery();
+  // const itemsQuery = trpc.getAllItems.useQuery(undefined, {
+  //   enabled: !!user.isSignedIn,
+  // });
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
+    userId: user.user?.id as string,
   });
 
-  const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: user?.id,
-  });
+  // const favoritesQuery = trpc.getFavoritesItems.useQuery({
+  //   userId: user?.id,
+  // });
 
   // Logging out all the results of requests
   // console.log("items", itemsQuery.data);
   // console.log("favorites", favoritesQuery.data);
   // console.log("cart", cartQuery.data);
 
-  function addToCart(item) {
-    if (!user) {
-      // Redirect to login and then back to the current page after login
-      const currentPath = encodeURIComponent(router.asPath);
-      router.push(`/sign-in?redirect=${currentPath}`);
-      return;
-    } else {
-      const cartElement = cartQuery.data?.find(
-        (element) => element.itemId === item.id
-      );
-      addItemToCartMutation.mutate(
-        {
-          userId: user?.id,
-          itemId: item.id,
-          cartItemId: cartElement === undefined ? "" : cartElement?.id,
+  function addToCart(item: Item) {
+    const cartElement = cartQuery.data?.find(
+      (element) => element.itemId === item.id
+    );
+    addItemToCartMutation.mutate(
+      {
+        userId: user.user?.id as string,
+        itemId: item.id,
+        cartItemId: cartElement === undefined ? "" : cartElement?.id,
+      },
+      {
+        onSuccess: (data) => {
+          // Invalidate specific queries after the mutation is successful
+          queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+          console.log("Add to cart OnSuccess", data);
         },
-        {
-          onSuccess: (data) => {
-            // Invalidate specific queries after the mutation is successful
-            queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-            console.log("Add to cart OnSuccess", data);
-          },
-        }
-      );
-    }
+      }
+    );
   }
+  // function addToCart(item) {
+  //   const cartElement = cartQuery.data?.find(
+  //     (element) => element.itemId === item.id
+  //   );
+  //   console.log("Added");
+  //   addItemToCartMutation.mutate(
+  //     {
+  //       userId: user?.id,
+  //       itemId: item.id,
+  //       cartItemId: cartElement === undefined ? "" : cartElement?.id,
+  //     },
+  //     {
+  //       onSuccess: (data) => {
+  //         // Invalidate specific queries after the mutation is successful
+  //         queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
+  //         console.log("Add to cart OnSuccess", data);
+  //       },
+  //     }
+  //   );
+  // }
 
   return (
     <div className="container mx-auto px-12 py-12">

@@ -3,7 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
 
 export default function Favorites() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { user } = useUser();
+  console.log(user?.id);
   const deleteItemFromFavoritesMuattion =
     trpc.deleteFromFavorites.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
@@ -15,26 +16,9 @@ export default function Favorites() {
     userId: user?.id,
   });
 
-  // function deleteFromFavorites(item) {
-  //   const favoritesElement = favoritesQuery.data.find(
-  //     (element) => element.itemId === item.item.id
-  //   );
-  //   console.log(favoritesQuery.data);
-  //   deleteItemFromFavoritesMuattion.mutate(
-  //     {
-  //       userId: user?.id,
-  //       itemId: item.item.id,
-  //       favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
-  //     },
-  //     {
-  //       onSuccess: (data) => {
-  //         // Invalidate specific queries after the mutation is successful
-  //         queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
-  //         console.log("Add to favorites OnSuccess", data);
-  //       },
-  //     }
-  //   );
-  // }
+  const cartQuery = trpc.getCartItems.useQuery({
+    userId: user?.id as string,
+  });
 
   function changeFavorites(item) {
     const favoritesElement = favoritesQuery.data?.find(
