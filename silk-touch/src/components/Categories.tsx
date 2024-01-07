@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { trpc } from "../pages/utils/trpc";
+import { useUser } from "@clerk/nextjs";
 
 export default function Categories() {
-  const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
+  const user = useUser();
+  const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery(undefined, {
+    enabled: !!user.isSignedIn,
+  });
 
   return (
     <>

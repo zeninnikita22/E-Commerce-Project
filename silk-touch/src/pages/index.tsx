@@ -18,7 +18,7 @@ export default function Home() {
     <div className="bg-off-white">
       <div className="mx-auto">
         <Categories />
-        <Sort sortInput={sortInput} setSortInput={setSortInput} />
+        <Sort setSortInput={setSortInput} />
         <Products sortInput={sortInput} />
         <AboutUsCard />
       </div>

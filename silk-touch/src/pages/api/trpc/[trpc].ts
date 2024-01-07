@@ -30,6 +30,8 @@ const appRouter = router({
         },
       },
     });
+
+    console.log({ serverData: data });
     return data;
   }),
 

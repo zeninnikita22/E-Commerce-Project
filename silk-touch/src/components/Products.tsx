@@ -7,11 +7,13 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 
 const Products = ({ sortInput }) => {
+  const user = useUser();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const itemsQuery = trpc.getAllItems.useQuery();
+  const itemsQuery = trpc.getAllItems.useQuery(undefined, {
+    enabled: !!user.isSignedIn,
+  });
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-  const { isLoaded, isSignedIn, user } = useUser();
 
   const cartQuery = trpc.getCartItems.useQuery({
     userId: user?.id,
