@@ -20,7 +20,7 @@ const AboutUsCard = () => {
       </div>
       <div className="w-1/2">
         <img
-          src="https://storage.googleapis.com/silk-touch/Images/About/Cotton.jpeg"
+          src="https://i.imgur.com/cVVn26j.jpg"
           alt="About Us"
           className="h-full w-full object-cover"
         />

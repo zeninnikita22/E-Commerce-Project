@@ -345,7 +345,7 @@ const appRouter = router({
         title: z.string(),
         content: z.string(),
         price: z.number(),
-        category: z.string(),
+        categoryId: z.number(),
         subcategory: z.string(),
         published: z.boolean(),
       })
@@ -357,8 +357,8 @@ const appRouter = router({
             title: input.title,
             content: input.content,
             price: input.price,
-            category: input.category,
-            subcategory: input.subcategory,
+            categoryId: input.categoryId,
+            // subcategory: input.subcategory,
             published: input.published,
           },
         });
@@ -374,8 +374,8 @@ const appRouter = router({
         title: z.string(),
         content: z.string(),
         price: z.number(),
-        category: z.string(),
-        subcategory: z.string(),
+        categoryId: z.number(),
+        // subcategory: z.string(),
         published: z.boolean(),
       })
     )
@@ -389,8 +389,8 @@ const appRouter = router({
             title: input.title,
             content: input.content,
             price: input.price,
-            category: input.category,
-            subcategory: input.subcategory,
+            categoryId: input.categoryId,
+            // subcategory: input.subcategory,
             published: input.published,
           },
         });

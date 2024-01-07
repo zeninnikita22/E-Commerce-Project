@@ -24,7 +24,7 @@ const navigation = [
   { name: "About Us", href: "/about", current: false },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -33,8 +33,15 @@ export default function Navigation() {
   const [openShoppingCart, setOpenShoppingCart] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
+
+  // console.log(user);
+
+  // if (!user) {
+  //   return <div>Loading</div>;
+  // }
+
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
+    userId: user?.id as string,
   });
   const categoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const router = useRouter();
@@ -127,7 +134,7 @@ export default function Navigation() {
                                 <div className="py-1">
                                   {categoriesQuery.data?.map((item) => {
                                     return (
-                                      <Menu.Item>
+                                      <Menu.Item key={item.id}>
                                         {({ active }) => (
                                           <a
                                             href={`/categories/${item.id}`}
@@ -239,7 +246,8 @@ export default function Navigation() {
                             d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
                           />
                         </svg>
-                        {cartQuery.data?.reduce((totalQuantity, cartItem) => {
+                        {cartQuery.data &&
+                        cartQuery.data?.reduce((totalQuantity, cartItem) => {
                           return totalQuantity + cartItem.quantity;
                         }, 0) > 0 ? (
                           <div className="absolute top-0 right-0 transform translate-x-0.5 -translate-y-1/2 bg-pistachio rounded-full w-4 h-4 flex items-center justify-center text-black font-semibold text-xs">

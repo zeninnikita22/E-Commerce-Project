@@ -6,8 +6,15 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { Category, Item, ItemImage } from "@prisma/client";
 
-export default function Product({ product, category }) {
+export default function Product({
+  product,
+  category,
+}: {
+  product: Item & { images: ReadonlyArray<ItemImage> };
+  category: Category;
+}) {
   const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -17,20 +24,20 @@ export default function Product({ product, category }) {
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
+    userId: user?.id as string,
   });
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: user?.id,
+    userId: user?.id as string,
   });
 
-  function addToCart(item) {
+  function addToCart(item: Item) {
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
     addItemToCartMutation.mutate(
       {
-        userId: user?.id,
+        userId: user?.id as string,
         itemId: item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
@@ -44,14 +51,14 @@ export default function Product({ product, category }) {
     );
   }
 
-  function changeFavorites(item) {
+  function changeFavorites(item: Item) {
     const favoritesElement = favoritesQuery.data?.find(
       (element) => element.itemId === item.id
     );
     console.log(favoritesQuery.data);
     changeFavoritesItemsMutation.mutate(
       {
-        userId: user?.id,
+        userId: user?.id as string,
         itemId: item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
@@ -65,14 +72,13 @@ export default function Product({ product, category }) {
     );
   }
 
-  console.log(itemsQuery.data);
-  // // const [mainImage, setMainImage] = useState("");
+  console.log("ITEMS QUERY", itemsQuery.data);
   // console.log(favoritesQuery.data);
-  console.log(product);
+  // console.log(product);
 
   const [selectedImage, setSelectedImage] = useState(product?.images[0]);
 
-  const handleHover = (image) => {
+  const handleHover = (image: ItemImage) => {
     setSelectedImage(image);
   };
 
@@ -224,6 +230,7 @@ export async function getStaticPaths() {
   return { paths, fallback: true };
 }
 
+//@ts-ignore FIX ME PLEASE
 export async function getStaticProps({ params }) {
   // Destructure params to extract categoryId and productId
   const { categoryId, productId } = params;

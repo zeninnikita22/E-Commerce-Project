@@ -14,6 +14,7 @@ export default function Categories() {
                 <div
                   className="relative bg-cover transition-transform transform duration-500 shadow-categoryCard rounded-lg hover:scale-105 cursor-pointer w-96 h-96"
                   style={{ backgroundImage: `url(${category.imageUrl})` }}
+                  key={category.id}
                 >
                   <h2 className="absolute text-white font-raleway font-medium text-2xl bottom-4 left-4 mb-3 ml-3 z-10">
                     {category.name

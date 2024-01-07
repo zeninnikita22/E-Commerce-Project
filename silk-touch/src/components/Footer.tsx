@@ -54,7 +54,7 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-300">
               {itemsCategoriesQuery.data?.map((category) => {
                 return (
-                  <li>
+                  <li key={category.id}>
                     <Link href={`/categories/${category.id}`}>
                       {category.name
                         .split("&")
