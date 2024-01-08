@@ -9,13 +9,16 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useUserId } from "../pages/UserContext";
 
 const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
   const router = useRouter();
+  const userId = useUserId();
+  const { isLoaded, isSignedIn, user } = useUser();
+
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   );
-  const { isLoaded, isSignedIn, user } = useUser();
 
   const decreaseCartItemQuantityMutation = trpc.decreaseCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
@@ -27,7 +30,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
   const queryClient = useQueryClient();
 
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
+    userId: userId,
   });
 
   function addToCart(element) {
@@ -36,7 +39,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
     );
     addItemToCartMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: element.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
@@ -56,7 +59,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
     );
     decreaseCartItemQuantityMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: element.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
@@ -76,7 +79,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
     );
     deleteItemFromCartMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: element.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
@@ -103,7 +106,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
 
     changeCartItemQuantityMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: element.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
         quantity: Number(quantityValue),

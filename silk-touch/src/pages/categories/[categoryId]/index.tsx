@@ -3,13 +3,17 @@ import { useUser } from "@clerk/nextjs";
 import prisma from "../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useUserId } from "../../UserContext";
 
 export default function Category({ category }) {
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-  const { isLoaded, isSignedIn, user } = useUser();
+
+  // const { isLoaded, isSignedIn, user } = useUser();
+  const userId = useUserId();
+
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id,
+    userId: userId,
   });
 
   function addToCart(item) {
@@ -18,7 +22,7 @@ export default function Category({ category }) {
     );
     addItemToCartMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },

@@ -1,10 +1,12 @@
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
+import { useUserId } from "./UserContext";
 
 export default function Favorites() {
-  const { user } = useUser();
-  console.log(user?.id);
+  // const { user } = useUser();
+  const userId = useUserId();
+
   const deleteItemFromFavoritesMuattion =
     trpc.deleteFromFavorites.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
@@ -12,13 +14,23 @@ export default function Favorites() {
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
-  const favoritesQuery = trpc.getFavoritesItems.useQuery({
-    userId: user?.id,
-  });
+  const cartQuery = trpc.getCartItems.useQuery(
+    {
+      userId: userId,
+    },
+    {
+      enabled: !!userId,
+    }
+  );
 
-  const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id as string,
-  });
+  const favoritesQuery = trpc.getFavoritesItems.useQuery(
+    {
+      userId: userId,
+    },
+    {
+      enabled: !!userId,
+    }
+  );
 
   function changeFavorites(item) {
     const favoritesElement = favoritesQuery.data?.find(
@@ -28,7 +40,7 @@ export default function Favorites() {
     console.log("Button changeFavorites clicked", item);
     changeFavoritesItemsMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: item.item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
@@ -48,7 +60,7 @@ export default function Favorites() {
     );
     addItemToCartMutation.mutate(
       {
-        userId: user?.id,
+        userId: userId,
         itemId: item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },

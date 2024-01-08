@@ -11,6 +11,7 @@ import { trpc } from "../pages/utils/trpc";
 
 import { UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { useUserId } from "../pages/UserContext";
 
 import Search from "./Search";
 import ShoppingCart from "./ShoppingCart";
@@ -40,8 +41,10 @@ export default function Navigation() {
   //   return <div>Loading</div>;
   // }
 
+  const userId = useUserId();
+
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user?.id as string,
+    userId: userId,
   });
   const categoriesQuery = trpc.getAllCategoriesItems.useQuery();
   const router = useRouter();

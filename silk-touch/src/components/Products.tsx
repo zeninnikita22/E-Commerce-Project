@@ -6,9 +6,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import { Item } from "@prisma/client";
+import { useUserId } from "../pages/UserContext";
 
 const Products = ({ sortInput }) => {
-  const user = useUser();
+  // const user = useUser();
+  const userId = useUserId();
   const router = useRouter();
   const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
@@ -18,7 +20,7 @@ const Products = ({ sortInput }) => {
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery({
-    userId: user.user?.id as string,
+    userId: userId,
   });
 
   // const favoritesQuery = trpc.getFavoritesItems.useQuery({
@@ -36,7 +38,7 @@ const Products = ({ sortInput }) => {
     );
     addItemToCartMutation.mutate(
       {
-        userId: user.user?.id as string,
+        userId: userId,
         itemId: item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },

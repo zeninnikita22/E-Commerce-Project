@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import AboutUsCard from "../components/AboutUsCard";
 import Products from "../components/Products";
+import { useUserId } from "./UserContext";
 
 export default function Home() {
   const [sortInput, setSortInput] = useState("");
