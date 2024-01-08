@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Category, Item, ItemImage } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-// import { useUserId } from "../../../../UserContext";
+import { useUserId } from "../../../../UserContext";
 
 export default function Product({
   product,
@@ -15,55 +15,29 @@ export default function Product({
   product: Item & { images: ReadonlyArray<ItemImage> };
   category: Category;
 }) {
-  const { isSignedIn, user } = useUser();
-  // const userId = useUserId();
-  // console.log(userId);
-  const [userId, setUserId] = useState("");
+  // const { isSignedIn, user } = useUser();
+  const userId = useUserId();
+  console.log(userId);
+  // const [userId, setUserId] = useState("");
 
-  // let userId = "";
-
-  // function checkUserId() {
-  //   if (isSignedIn) {
-  //     userId = user.id;
-  //     console.log("User is signed in!");
-  //   } else {
-  //     let guestUserId = localStorage.getItem("guestUserId");
-
-  //     if (!guestUserId) {
-  //       guestUserId = uuidv4();
-  //       localStorage.setItem("guestUserId", guestUserId);
-  //       console.log(
-  //         "There is no guestId in local storage so we add it there",
-  //         guestUserId
-  //       );
+  // useEffect(() => {
+  //   // Function to update userId based on authentication status or local storage
+  //   const updateUserId = () => {
+  //     if (isSignedIn) {
+  //       return user.id;
   //     } else {
-  //       userId = guestUserId;
-  //       console.log(
-  //         "User is not signed in, but there is a guestId in local storage",
-  //         guestUserId
-  //       );
+  //       let guestUserId = localStorage.getItem("guestUserId");
+  //       if (!guestUserId) {
+  //         guestUserId = uuidv4();
+  //         localStorage.setItem("guestUserId", guestUserId);
+  //       }
+  //       return guestUserId;
   //     }
-  //   }
-  // }
+  //   };
 
-  useEffect(() => {
-    // Function to update userId based on authentication status or local storage
-    const updateUserId = () => {
-      if (isSignedIn) {
-        return user.id;
-      } else {
-        let guestUserId = localStorage.getItem("guestUserId");
-        if (!guestUserId) {
-          guestUserId = uuidv4();
-          localStorage.setItem("guestUserId", guestUserId);
-        }
-        return guestUserId;
-      }
-    };
-
-    const currentUserId = updateUserId();
-    setUserId(currentUserId);
-  }, [isSignedIn, user]);
+  //   const currentUserId = updateUserId();
+  //   setUserId(currentUserId);
+  // }, [isSignedIn, user]);
 
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -75,19 +49,19 @@ export default function Product({
   const cartQuery = trpc.getCartItems.useQuery(
     {
       userId: userId,
+    },
+    {
+      enabled: !!userId,
     }
-    // {
-    //   enabled: !!userId,
-    // }
   );
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery(
     {
       userId: userId,
+    },
+    {
+      enabled: !!userId,
     }
-    // {
-    //   enabled: !!userId,
-    // }
   );
 
   function addToCart(item: Item) {
