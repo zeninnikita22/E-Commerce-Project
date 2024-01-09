@@ -2,6 +2,7 @@ import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
 import { useUserId } from "./UserContext";
+import { Item } from "@prisma/client";
 
 export default function Favorites() {
   // const { user } = useUser();
@@ -55,13 +56,10 @@ export default function Favorites() {
     );
   }
 
-  function addToCart(item) {
-    // console.log("CART QUERY", cartQuery.data);
+  function addToCart(item: Item) {
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.item.id
     );
-    console.log("ITEM", item);
-    // console.log("CART ELEMENT", cartElement);
     addItemToCartMutation.mutate(
       {
         userId: userId,

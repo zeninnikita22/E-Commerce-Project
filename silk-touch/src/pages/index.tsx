@@ -1,7 +1,7 @@
 import Categories from "../components/Categories";
 import Sort from "../components/Sort";
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignIn } from "@clerk/nextjs";
 import AboutUsCard from "../components/AboutUsCard";
 import Products from "../components/Products";
 import { useUserId } from "./UserContext";
@@ -20,6 +20,7 @@ export default function Home() {
     <div className="bg-off-white">
       <div className="mx-auto">
         {/* {isSignedIn && <div>Welcome, {user.firstName}!</div>} */}
+
         <Categories />
         <Sort setSortInput={setSortInput} />
         <Products sortInput={sortInput} />

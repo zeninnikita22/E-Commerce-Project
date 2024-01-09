@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <>
       Please sign in to proceed
-      <SignIn />
+      <SignIn afterSignInUrl="/" />
     </>
   );
 }

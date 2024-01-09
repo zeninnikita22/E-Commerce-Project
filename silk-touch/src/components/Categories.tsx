@@ -35,7 +35,7 @@ export default function Categories() {
                   </h2>
 
                   <Link href={`/categories/${category.id}`} passHref>
-                    <div className="block h-full w-full absolute top-0 left-0 z-0"></div>
+                    <div className="block h-full w-full absolute top-0 left-0 z-1"></div>
                   </Link>
                 </div>
               ))}

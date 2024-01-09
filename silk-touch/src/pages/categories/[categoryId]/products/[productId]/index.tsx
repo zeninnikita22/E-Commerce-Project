@@ -66,12 +66,9 @@ export default function Product({
 
   function addToCart(item: Item) {
     // checkUserId();
-    console.log("CART QUERY", cartQuery.data);
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
-    console.log("ITEM ID", item.id);
-    console.log("CART ELEMENT", cartElement);
     addItemToCartMutation.mutate(
       {
         userId: userId,

@@ -2,14 +2,14 @@ import React from "react";
 import { Fragment, useEffect } from "react";
 import { useState } from "react";
 
-import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Disclosure, Menu, Transition, Popover } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { useRouter } from "next/router";
 import { trpc } from "../pages/utils/trpc";
 
-import { UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { useUserId } from "../pages/UserContext";
 
@@ -33,6 +33,7 @@ export default function Navigation() {
   const [iconIsHovered, setIconIsHovered] = useState(false);
   const [openShoppingCart, setOpenShoppingCart] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
 
   // console.log(user);
@@ -263,10 +264,63 @@ export default function Navigation() {
                           </div>
                         ) : null}
                       </button>
-                    </div>
-                    {/* Clerk profile */}
-                    <div className="ml-2">
-                      <UserButton afterSignOutUrl="/" />
+                      {/* Profile */}
+                      <Popover className="relative">
+                        <Popover.Button
+                          // onClick={() => {
+                          //   setLoginOpen(!loginOpen);
+                          // }}
+                          type="button"
+                          className="relative bg-off-white px-2 text-black hover:text-pistachio transition-colors duration-300 ease-in-out"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                            />
+                          </svg>
+                        </Popover.Button>
+
+                        <Transition
+                          enter="transition duration-100 ease-out"
+                          enterFrom="transform scale-95 opacity-0"
+                          enterTo="transform scale-100 opacity-100"
+                          leave="transition duration-75 ease-out"
+                          leaveFrom="transform scale-100 opacity-100"
+                          leaveTo="transform scale-95 opacity-0"
+                        >
+                          <Popover.Panel className="absolute z-100 mt-5 w-screen max-w-sm right-0 px-4 sm:px-0 lg:max-w-l">
+                            <div className="rounded-lg shadow-lg ring-1 ring-black/5 py-4 px-2">
+                              <div className="relative ">
+                                {isSignedIn ? (
+                                  <UserButton afterSignOutUrl="/" />
+                                ) : (
+                                  <div className="flex justify-center gap-6">
+                                    <SignInButton>
+                                      <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
+                                        Log in
+                                      </button>
+                                    </SignInButton>
+                                    <SignUpButton>
+                                      <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
+                                        Register
+                                      </button>
+                                    </SignUpButton>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Popover.Panel>
+                        </Transition>
+                      </Popover>
                     </div>
                   </div>
                 </div>
