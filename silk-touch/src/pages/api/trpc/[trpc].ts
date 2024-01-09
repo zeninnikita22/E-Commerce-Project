@@ -436,7 +436,7 @@ const appRouter = router({
     )
     .mutation(async ({ input }) => {
       const cartItems = input.cartItems;
-      console.log(cartItems);
+      // console.log(cartItems);
       try {
         // Create Checkout Sessions from body params.
         const session = await stripe.checkout.sessions.create({
@@ -453,7 +453,8 @@ const appRouter = router({
         return session;
         // res.redirect(303, session.url);
       } catch (error) {
-        throw new Error("Error!");
+        console.log(error);
+        throw new Error("Checkout error!");
       }
     }),
 });
