@@ -7,11 +7,12 @@ export default function Favorites() {
   // const { user } = useUser();
   const userId = useUserId();
 
-  const deleteItemFromFavoritesMuattion =
-    trpc.deleteFromFavorites.useMutation();
+  // const deleteItemFromFavoritesMuattion =
+  //   trpc.deleteFromFavorites.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
   const queryClient = useQueryClient();
+
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery(
@@ -55,13 +56,16 @@ export default function Favorites() {
   }
 
   function addToCart(item) {
+    // console.log("CART QUERY", cartQuery.data);
     const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === item.id
+      (element) => element.itemId === item.item.id
     );
+    console.log("ITEM", item);
+    // console.log("CART ELEMENT", cartElement);
     addItemToCartMutation.mutate(
       {
         userId: userId,
-        itemId: item.id,
+        itemId: item.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {

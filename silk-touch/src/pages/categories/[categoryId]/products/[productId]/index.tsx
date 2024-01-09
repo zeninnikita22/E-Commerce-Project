@@ -17,7 +17,7 @@ export default function Product({
 }) {
   // const { isSignedIn, user } = useUser();
   const userId = useUserId();
-  console.log(userId);
+  // console.log(userId);
   // const [userId, setUserId] = useState("");
 
   // useEffect(() => {
@@ -41,9 +41,9 @@ export default function Product({
 
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-  const [numberOfCartItems, setNumberOfCartItems] = useState(0);
+  // const [numberOfCartItems, setNumberOfCartItems] = useState(0);
   const itemsQuery = trpc.getAllItems.useQuery();
-  const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
+  // const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery(
@@ -66,11 +66,12 @@ export default function Product({
 
   function addToCart(item: Item) {
     // checkUserId();
-    console.log(cartQuery.data);
+    console.log("CART QUERY", cartQuery.data);
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
-
+    console.log("ITEM ID", item.id);
+    console.log("CART ELEMENT", cartElement);
     addItemToCartMutation.mutate(
       {
         userId: userId,
