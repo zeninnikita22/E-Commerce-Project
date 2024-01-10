@@ -20,25 +20,6 @@ export default function Product({
   // console.log(userId);
   // const [userId, setUserId] = useState("");
 
-  // useEffect(() => {
-  //   // Function to update userId based on authentication status or local storage
-  //   const updateUserId = () => {
-  //     if (isSignedIn) {
-  //       return user.id;
-  //     } else {
-  //       let guestUserId = localStorage.getItem("guestUserId");
-  //       if (!guestUserId) {
-  //         guestUserId = uuidv4();
-  //         localStorage.setItem("guestUserId", guestUserId);
-  //       }
-  //       return guestUserId;
-  //     }
-  //   };
-
-  //   const currentUserId = updateUserId();
-  //   setUserId(currentUserId);
-  // }, [isSignedIn, user]);
-
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
   // const [numberOfCartItems, setNumberOfCartItems] = useState(0);

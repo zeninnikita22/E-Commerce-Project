@@ -38,6 +38,7 @@ const appRouter = router({
   ///
   /// Cart operations ///
   ///
+
   addCartItem: publicProcedure
     .input(
       z.object({
@@ -224,6 +225,38 @@ const appRouter = router({
         // Create a new cart item and associate it with the user
       } catch (error) {
         console.error("Error adding item to cart:", error);
+      }
+    }),
+
+  ///
+  /// Migrating items from guest to user cart  ///
+  ///
+
+  migrateCart: publicProcedure
+    .input(
+      z.object({
+        guestUserId: z.string(),
+        authorizedUserId: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { guestUserId, authorizedUserId } = input;
+
+      try {
+        const updatedCartItems = await prisma.cartItem.updateMany({
+          where: {
+            userId: guestUserId,
+          },
+          data: {
+            userId: authorizedUserId,
+          },
+        });
+
+        console.log("Cart items migrated: ", updatedCartItems);
+        return updatedCartItems;
+      } catch (error) {
+        console.error("Error migrating cart items: ", error);
+        throw new Error("Failed to migrate cart items.");
       }
     }),
 
@@ -453,7 +486,7 @@ const appRouter = router({
         return session;
         // res.redirect(303, session.url);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw new Error("Checkout error!");
       }
     }),
