@@ -1,4 +1,5 @@
 import React from "react";
+
 import { Fragment, useEffect } from "react";
 import { useState } from "react";
 
@@ -11,6 +12,7 @@ import { trpc } from "../pages/utils/trpc";
 
 import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { SignIn, SignUp } from "@clerk/clerk-react";
 import { useUserId } from "../pages/UserContext";
 
 import Search from "./Search";
@@ -289,37 +291,71 @@ export default function Navigation() {
                           </svg>
                         </Popover.Button>
 
-                        <Transition
-                          enter="transition duration-100 ease-out"
-                          enterFrom="transform scale-95 opacity-0"
-                          enterTo="transform scale-100 opacity-100"
-                          leave="transition duration-75 ease-out"
-                          leaveFrom="transform scale-100 opacity-100"
-                          leaveTo="transform scale-95 opacity-0"
-                        >
-                          <Popover.Panel className="absolute z-100 mt-5 w-screen max-w-sm right-0 px-4 sm:px-0 lg:max-w-l">
-                            <div className="rounded-lg shadow-lg ring-1 ring-black/5 py-4 px-2">
+                        <Fragment>
+                          <Transition
+                            enter="transition duration-100 ease-out"
+                            enterFrom="transform scale-95 opacity-0"
+                            enterTo="transform scale-100 opacity-100"
+                            leave="transition duration-75 ease-out"
+                            leaveFrom="transform scale-100 opacity-100"
+                            leaveTo="transform scale-95 opacity-0"
+                          >
+                            <Popover.Panel className="absolute  mt-5 w-screen max-w-sm right-10 px-4 sm:px-0 lg:max-w-l">
                               <div className="relative ">
                                 {isSignedIn ? (
                                   <UserButton afterSignOutUrl="/" />
+                                ) : !loginOpen ? (
+                                  <div className="flex flex-col justify-normal">
+                                    {" "}
+                                    <SignIn
+                                      afterSignInUrl="/"
+                                      appearance={{
+                                        elements: {
+                                          card: "bg-off-white",
+                                          headerTitle: "font-quicksand",
+
+                                          formButtonPrimary:
+                                            "bg-pistachio text-black hover:bg-slate-300 text-sm normal-case font-raleway",
+                                        },
+                                      }}
+                                    />
+                                  </div>
                                 ) : (
-                                  <div className="flex justify-center gap-6">
-                                    <SignInButton>
-                                      <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
-                                        Log in
-                                      </button>
-                                    </SignInButton>
-                                    <SignUpButton>
-                                      <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
-                                        Register
-                                      </button>
-                                    </SignUpButton>
+                                  <div className="flex flex-col justify-normal">
+                                    <SignUp
+                                      afterSignUpUrl="/"
+                                      appearance={{
+                                        elements: {
+                                          card: "bg-off-white border-none shadow-white",
+                                          headerTitle: "font-quicksand",
+
+                                          formButtonPrimary:
+                                            "bg-pistachio text-black hover:bg-slate-300 text-sm normal-case font-raleway",
+                                        },
+                                      }}
+                                    />
                                   </div>
                                 )}
+                                {/* {isSignedIn ? (
+                                    <UserButton afterSignOutUrl="/" />
+                                  ) : (
+                                    <div className="flex justify-center gap-6">
+                                      <SignInButton>
+                                        <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
+                                          Log in
+                                        </button>
+                                      </SignInButton>
+                                      <SignUpButton>
+                                        <button className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
+                                          Register
+                                        </button>
+                                      </SignUpButton>
+                                    </div>
+                                  )} */}
                               </div>
-                            </div>
-                          </Popover.Panel>
-                        </Transition>
+                            </Popover.Panel>
+                          </Transition>
+                        </Fragment>
                       </Popover>
                     </div>
                   </div>

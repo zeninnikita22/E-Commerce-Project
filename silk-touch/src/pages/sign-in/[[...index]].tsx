@@ -9,8 +9,18 @@ export default function Page() {
   // redirectUrl={redirectPath}
   return (
     <>
-      Please sign in to proceed
-      <SignIn afterSignInUrl="/" />
+      <SignIn
+        afterSignInUrl="/"
+        appearance={{
+          elements: {
+            card: "bg-off-white",
+            headerTitle: "font-quicksand",
+
+            formButtonPrimary:
+              "bg-pistachio text-black hover:bg-slate-300 text-sm normal-case font-raleway",
+          },
+        }}
+      />
     </>
   );
 }

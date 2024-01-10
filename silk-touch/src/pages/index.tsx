@@ -17,15 +17,13 @@ export default function Home() {
 
   // User-specific content (e.g., user's name or profile link) can be rendered conditionally
   return (
-    <div className="bg-off-white">
-      <div className="mx-auto">
-        {/* {isSignedIn && <div>Welcome, {user.firstName}!</div>} */}
+    <>
+      {/* {isSignedIn && <div>Welcome, {user.firstName}!</div>} */}
 
-        <Categories />
-        <Sort setSortInput={setSortInput} />
-        <Products sortInput={sortInput} />
-        <AboutUsCard />
-      </div>
-    </div>
+      <Categories />
+      <Sort setSortInput={setSortInput} />
+      <Products sortInput={sortInput} />
+      <AboutUsCard />
+    </>
   );
 }

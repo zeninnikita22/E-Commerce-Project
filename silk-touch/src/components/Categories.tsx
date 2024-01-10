@@ -19,7 +19,7 @@ export default function Categories() {
             <div className="mt-6 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
               {itemsCategoriesQuery.data?.map((category) => (
                 <div
-                  className="relative bg-cover transition-transform transform duration-500 shadow-categoryCard rounded-lg hover:scale-105 cursor-pointer w-96 h-96"
+                  className="relative bg-cover transition-transform transform duration-500  rounded-lg hover:scale-105 cursor-pointer w-96 h-96 shadow-categoryCard"
                   style={{ backgroundImage: `url(${category.imageUrl})` }}
                   key={category.id}
                 >
@@ -35,7 +35,7 @@ export default function Categories() {
                   </h2>
 
                   <Link href={`/categories/${category.id}`} passHref>
-                    <div className="block h-full w-full absolute top-0 left-0 z-1"></div>
+                    {/* <div className="block h-full w-full absolute top-0 left-0 z-0"></div> */}
                   </Link>
                 </div>
               ))}
