@@ -300,10 +300,12 @@ export default function Navigation() {
                             leaveFrom="transform scale-100 opacity-100"
                             leaveTo="transform scale-95 opacity-0"
                           >
-                            <Popover.Panel className="absolute  mt-5 w-screen max-w-sm right-10 px-4 sm:px-0 lg:max-w-l">
+                            <Popover.Panel className="absolute mt-5 w-screen max-w-sm right-10 px-4 sm:px-0 lg:max-w-l">
                               <div className="relative ">
                                 {isSignedIn ? (
-                                  <UserButton afterSignOutUrl="/" />
+                                  <div className="flex justify-center rounded-lg bg-off-white transition duration-200 shadow-lg border border-transparent">
+                                    <UserButton afterSignOutUrl="/" />
+                                  </div>
                                 ) : !loginOpen ? (
                                   <div className="flex flex-col justify-normal">
                                     {" "}

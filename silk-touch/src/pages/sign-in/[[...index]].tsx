@@ -8,7 +8,7 @@ export default function Page() {
   //   : "/"; // Default redirection to home if no redirect query param
   // redirectUrl={redirectPath}
   return (
-    <>
+    <div className="flex justify-center items-center pt-20">
       <SignIn
         afterSignInUrl="/"
         appearance={{
@@ -21,6 +21,6 @@ export default function Page() {
           },
         }}
       />
-    </>
+    </div>
   );
 }
