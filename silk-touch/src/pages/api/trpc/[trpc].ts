@@ -274,13 +274,20 @@ const appRouter = router({
       try {
         const result = await prisma.favorites.findMany({
           where: { userId: input.userId },
-          include: { item: true },
+          include: {
+            item: {
+              include: {
+                images: true, // Include images for each item
+              },
+            },
+          },
         });
         return result;
       } catch (error) {
         console.error("Error finding favorites for a user", error);
       }
     }),
+
   changeFavorites: publicProcedure
     .input(
       z.object({

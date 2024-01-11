@@ -20,7 +20,7 @@ export default function Home() {
     <>
       {/* {isSignedIn && <div>Welcome, {user.firstName}!</div>} */}
 
-      <Categories />
+      {/* <Categories /> */}
       <Sort setSortInput={setSortInput} />
       <Products sortInput={sortInput} />
       <AboutUsCard />

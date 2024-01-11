@@ -10,7 +10,17 @@ export default function Profile() {
   return (
     <div className="flex justify-center items-center">
       <div className="my-12">
-        <UserProfile></UserProfile>
+        <UserProfile
+          appearance={{
+            elements: {
+              card: "bg-off-white",
+              headerTitle: "font-quicksand",
+
+              formButtonPrimary:
+                "bg-pistachio text-black hover:bg-slate-300 text-sm normal-case font-raleway",
+            },
+          }}
+        ></UserProfile>
       </div>
     </div>
   );

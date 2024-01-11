@@ -103,7 +103,7 @@ export default function Favorites() {
                   <a href="#" className="group flex justify-center">
                     <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                       <img
-                        src="https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg"
+                        src={`${item.item.images[0].url}`}
                         alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                         className="h-full w-full object-cover object-center group-hover:opacity-75"
                       />
