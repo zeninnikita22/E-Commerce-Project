@@ -2,11 +2,12 @@ import { trpc } from "../../../../utils/trpc";
 import prisma from "../../../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Category, Item, ItemImage } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { useUserId } from "../../../../UserContext";
+import { Dialog, Transition, Fragment } from "@headlessui/react";
 
 export default function Product({
   product,
@@ -15,8 +16,9 @@ export default function Product({
   product: Item & { images: ReadonlyArray<ItemImage> };
   category: Category;
 }) {
-  // const { isSignedIn, user } = useUser();
+  const { isSignedIn, user } = useUser();
   const userId = useUserId();
+  let [dialogIsOpen, setDialogIsOpen] = useState(false);
   // console.log(userId);
   // const [userId, setUserId] = useState("");
 
@@ -38,10 +40,10 @@ export default function Product({
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery(
     {
-      userId: userId,
+      userId: user?.id,
     },
     {
-      enabled: !!userId,
+      enabled: !!user?.id,
     }
   );
 
@@ -67,26 +69,30 @@ export default function Product({
   }
 
   function changeFavorites(item: Item) {
-    // checkUserId();
-    console.log(userId);
-    const favoritesElement = favoritesQuery.data?.find(
-      (element) => element.itemId === item.id
-    );
-    // console.log(favoritesQuery.data); ---> UNDEFINED
-    changeFavoritesItemsMutation.mutate(
-      {
-        userId: userId,
-        itemId: item.id,
-        favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
-      },
-      {
-        onSuccess: (data) => {
-          // Invalidate specific queries after the mutation is successful
-          queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
-          console.log("Add to favorites OnSuccess", data);
+    if (!isSignedIn) {
+      setDialogIsOpen(true);
+      console.log(dialogIsOpen);
+    } else {
+      const favoritesElement = favoritesQuery.data?.find(
+        (element) => element.itemId === item.id
+      );
+
+      changeFavoritesItemsMutation.mutate(
+        {
+          userId: user?.id,
+          itemId: item.id,
+          favoritesId:
+            favoritesElement === undefined ? "" : favoritesElement?.id,
         },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            // Invalidate specific queries after the mutation is successful
+            queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
+            console.log("Add to favorites OnSuccess", data);
+          },
+        }
+      );
+    }
   }
 
   // console.log("ITEMS QUERY", itemsQuery.data);
@@ -222,6 +228,101 @@ export default function Product({
           </div>
         </div>
       </div>
+      <>
+        {/* <div className="fixed inset-0 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => setDialogIsOpen(true)}
+            className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white hover:bg-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
+          >
+            Open dialog
+          </button>
+        </div> */}
+
+        <Transition appear show={dialogIsOpen} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-10"
+            onClose={() => setDialogIsOpen(false)}
+          >
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all ">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-medium leading-6 text-gray-900"
+                    >
+                      Please log in to add products to your favorites
+                    </Dialog.Title>
+                    {/* <button
+                      onClick={() => setDialogIsOpen(false)}
+                      className="absolute -top-4 right-0 m-2 rounded-full bg-gray-100 p-2 text-gray-700 hover:bg-gray-200 focus:outline-none"
+                      aria-label="Close"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button> */}
+                    <div className="flex justify-evenly">
+                      <div className="mt-6">
+                        <SignInButton>
+                          <button
+                            onClick={() => setDialogIsOpen(false)}
+                            className="bg-pistachio text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100"
+                          >
+                            Log in
+                          </button>
+                        </SignInButton>
+                      </div>
+
+                      <div className="mt-6">
+                        <button
+                          onClick={() => setDialogIsOpen(false)}
+                          className="bg-gray-200 text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </Dialog.Panel>
+                </Transition.Child>
+              </div>
+            </div>
+          </Dialog>
+        </Transition>
+      </>
     </div>
   );
 }

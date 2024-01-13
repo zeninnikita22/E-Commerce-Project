@@ -1,11 +1,11 @@
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { useUserId } from "./UserContext";
 import { Item } from "@prisma/client";
 
 export default function Favorites() {
-  // const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const userId = useUserId();
 
   // const deleteItemFromFavoritesMuattion =
@@ -27,7 +27,7 @@ export default function Favorites() {
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery(
     {
-      userId: userId,
+      userId: user?.id,
     },
     {
       enabled: !!userId,
@@ -42,7 +42,7 @@ export default function Favorites() {
     console.log("Button changeFavorites clicked", item);
     changeFavoritesItemsMutation.mutate(
       {
-        userId: userId,
+        userId: user?.id,
         itemId: item.item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
@@ -76,7 +76,27 @@ export default function Favorites() {
     );
   }
 
-  if (favoritesQuery.data?.length == 0) {
+  if (!isSignedIn) {
+    return (
+      <div>
+        <h1 className="text-xl font-bold font-quicksand mt-12 ml-12">
+          Favorites
+        </h1>
+        <div className="realtive flex justify-center items-center pt-12">
+          <div className="text-center max-w-md rounded-lg shadow-lg ring-1 ring-black/5 py-4 px-8">
+            <h2 className="font-medium mb-4">
+              Please log in to view your favorites
+            </h2>
+            <SignInButton>
+              <button className="bg-pistachio text-black font-raleway font-light py-2 px-8 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100">
+                Log in
+              </button>
+            </SignInButton>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (favoritesQuery.data?.length == 0) {
     return (
       <>
         <h1 className="text-xl font-bold font-quicksand mt-12 ml-12">
