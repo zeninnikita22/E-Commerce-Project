@@ -400,8 +400,8 @@ const appRouter = router({
         content: z.string(),
         price: z.number(),
         categoryId: z.number(),
-        subcategory: z.string(),
         published: z.boolean(),
+        new: z.boolean(),
       })
     )
     .mutation(async ({ input }) => {
@@ -412,7 +412,7 @@ const appRouter = router({
             content: input.content,
             price: input.price,
             categoryId: input.categoryId,
-            // subcategory: input.subcategory,
+            new: input.new,
             published: input.published,
           },
         });
@@ -429,8 +429,8 @@ const appRouter = router({
         content: z.string(),
         price: z.number(),
         categoryId: z.number(),
-        // subcategory: z.string(),
         published: z.boolean(),
+        new: z.boolean(),
       })
     )
     .mutation(async ({ input }) => {
@@ -444,8 +444,8 @@ const appRouter = router({
             content: input.content,
             price: input.price,
             categoryId: input.categoryId,
-            // subcategory: input.subcategory,
             published: input.published,
+            new: input.new,
           },
         });
       } catch (error) {

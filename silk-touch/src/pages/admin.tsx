@@ -1,34 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "./utils/trpc";
-import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
 
 export default function Admin() {
-  const [editItemId, setEditItemId] = useState(null);
-  const [editedData, setEditedData] = useState({});
-  const { isLoaded, isSignedIn, user } = useUser();
   const createItemMutation = trpc.createItem.useMutation();
   const updateItemMutation = trpc.updateItem.useMutation();
   const deleteItemMutation = trpc.deleteItem.useMutation();
   const itemsQuery = trpc.getAllItems.useQuery();
   const queryClient = useQueryClient();
 
+  const [editingItem, setEditingItem] = useState(null);
+
+  const startEditing = (item) => {
+    setEditingItem(item);
+  };
+
+  const stopEditing = () => {
+    setEditingItem(null);
+  };
+
   console.log("Admin panel - items query", itemsQuery.data);
 
-  function createItem(e) {
+  function createItem(e: any) {
     e.preventDefault();
-    console.log(e);
+    console.log("Create item event", e);
     createItemMutation.mutate(
       {
         title: e.target[0].value,
         content: e.target[1].value,
         price: Number(e.target[2].value),
-        category: e.target[3].value,
-        subcategory: e.target[4].value,
-        published: e.target[5].checked,
+        categoryId: Number(e.target[3].value),
+        published: e.target[4].checked,
+        new: e.target[5].checked,
       },
       {
         onSuccess: (data) => {
@@ -39,18 +42,18 @@ export default function Admin() {
     );
   }
 
-  function editItem(e, itemId) {
+  function editItem(e: any, itemId: number) {
     e.preventDefault();
-    console.log(e, itemId);
+    console.log("Edit item event", e, itemId);
     updateItemMutation.mutate(
       {
         itemId: itemId,
         title: e.target[0].value,
         content: e.target[1].value,
         price: Number(e.target[2].value),
-        category: e.target[3].value,
-        subcategory: e.target[4].value,
-        published: e.target[5].checked,
+        categoryId: Number(e.target[3].value),
+        published: e.target[4].checked,
+        new: e.target[5].checked,
       },
       {
         onSuccess: (data) => {
@@ -61,7 +64,7 @@ export default function Admin() {
     );
   }
 
-  function deleteItem(id) {
+  function deleteItem(id: number) {
     console.log(id);
     deleteItemMutation.mutate(
       {
@@ -76,16 +79,6 @@ export default function Admin() {
     );
   }
 
-  const handleInputChange = (itemId, fieldName, value) => {
-    setEditedData((prevData) => ({
-      ...prevData,
-      [itemId]: {
-        ...prevData[itemId],
-        [fieldName]: value,
-      },
-    }));
-  };
-
   if (itemsQuery.isLoading && !itemsQuery.data) {
     return <div>...</div>;
   } else {
@@ -93,6 +86,7 @@ export default function Admin() {
       <div>
         <h1>Admin panel</h1>
         <h2>Create an item</h2>
+        {/* Form for creating an item */}
         <form onSubmit={(e) => createItem(e)}>
           <label htmlFor="title"> Title of item</label>
           <input type="text" name="title"></input>
@@ -102,208 +96,97 @@ export default function Admin() {
           <input type="number" name="price"></input>
           <label htmlFor="category"> Category of item</label>
           <input type="text" name="category"></input>
-          <label htmlFor="subcategory"> Subcategory of item</label>
-          <input type="text" name="subcategory"></input>
           <label htmlFor="published"> Is the item published?</label>
           <input type="checkbox" name="published" value="published"></input>
+          <label htmlFor="new"> Is the item new?</label>
+          <input type="checkbox" name="new" value="new"></input>
           <button type="submit">Create an item</button>
         </form>
 
+        {/* Edit Item Form */}
+        {editingItem && (
+          <form onSubmit={(e) => editItem(e, editingItem.id)}>
+            <h2>Edit an item</h2>
+            <label htmlFor="title">Title of item</label>
+            <input type="text" name="title" defaultValue={editingItem.title} />
+            <label htmlFor="content">Content of item</label>
+            <input
+              type="text"
+              name="content"
+              defaultValue={editingItem.content}
+            />
+
+            <label htmlFor="price">Price of item</label>
+            <input
+              type="number"
+              name="price"
+              defaultValue={editingItem.price}
+            />
+
+            <label htmlFor="categoryId">Category ID of item</label>
+            <input
+              type="number"
+              name="categoryId"
+              defaultValue={editingItem.categoryId}
+            />
+
+            <label htmlFor="published">Is the item published?</label>
+            <input
+              type="checkbox"
+              name="published"
+              defaultChecked={editingItem.published}
+            />
+
+            <label htmlFor="new">Is the item new?</label>
+            <input
+              type="checkbox"
+              name="new"
+              defaultChecked={editingItem.new}
+            />
+
+            <button type="submit">Update item</button>
+            <button type="button" onClick={stopEditing}>
+              Cancel
+            </button>
+          </form>
+        )}
+
+        {/* List of items */}
         <div>Items list</div>
         {itemsQuery.data?.map((item) => {
           return (
-            <div>
-              <form key={item.id} onSubmit={(e) => editItem(e, item.id)}>
-                <div>
-                  <div className="flex flex-col items-center">
-                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                      <img
+            <div key={item.id}>
+              <div className="flex flex-col items-center">
+                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                  {/* <img
                         src={`${item.images[0].url}`}
                         alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                         className="h-full w-full object-cover object-center group-hover:opacity-75"
-                      />
-                    </div>
-                    {/* <h1 className="mt-4 font-medium font-raleway text-black">
-                      {item.title.toUpperCase()}
-                    </h1>
-                    <p className="mt-2 text-xs font-medium text-black">
-                      {item.content}
-                    </p>
-                    <p className="mt-3 text-base font-roboto font-medium text-black">
-                      € {item.price}
-                    </p> */}
-
-                    {/* <button
-className="bg-pistachio mt-3 text-black font-raleway font-light py-2 px-20 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100"
->
-Add to cart
-</button> */}
-                  </div>
-                  <div>
-                    <div>
-                      <h1 className="mt-4 font-medium font-raleway text-black">
-                        {item.title}
-                      </h1>
-                    </div>
-                    <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                      <img
+                      /> */}
+                </div>
+              </div>
+              <div>
+                <div>
+                  <h1 className="mt-4 font-medium font-raleway text-black">
+                    {item.title}
+                  </h1>
+                </div>
+                <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
+                  {/* <img
                         src={`${item.images[0].url}`}
                         alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                         className="h-8 w-auto object-cover object-center group-hover:opacity-75"
-                      />
-                    </div>
-                    <p className="mt-2 text-xs font-medium text-black">
-                      {item.content}
-                    </p>
-                    <p className="mt-3 text-base font-roboto font-medium text-black">
-                      € {item.price}
-                    </p>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="title"> Title of item</label>
-                        <input
-                          type="text"
-                          name="title"
-                          value={
-                            (editedData[item.id] &&
-                              editedData[item.id]?.title) !== undefined
-                              ? editedData[item.id]?.title
-                              : item.title
-                          }
-                          onChange={(e) =>
-                            handleInputChange(item.id, "title", e.target.value)
-                          }
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div>{item.content}</div>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="content"> Content of item</label>
-                        <input
-                          type="text"
-                          name="content"
-                          value={editedData[item.id]?.content || item.content}
-                          onChange={(e) =>
-                            handleInputChange(
-                              item.id,
-                              "content",
-                              e.target.value
-                            )
-                          }
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div>{item.price}</div>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="title"> Price of item</label>
-                        <input
-                          type="number"
-                          name="price"
-                          value={
-                            (editedData[item.id] &&
-                              editedData[item.id]?.price) !== undefined
-                              ? editedData[item.id]?.price
-                              : item.price
-                          }
-                          onChange={(e) =>
-                            handleInputChange(item.id, "price", e.target.value)
-                          }
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div>{item.category}</div>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="category"> Category of item</label>
-                        <input
-                          type="text"
-                          name="category"
-                          value={
-                            (editedData[item.id] &&
-                              editedData[item.id]?.category) !== undefined
-                              ? editedData[item.id]?.category
-                              : item.category
-                          }
-                          onChange={(e) =>
-                            handleInputChange(
-                              item.id,
-                              "category",
-                              e.target.value
-                            )
-                          }
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div>{item.subcategory}</div>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="subcategory">
-                          {" "}
-                          Subcategory of item
-                        </label>
-                        <input
-                          type="text"
-                          name="subcategory"
-                          value={
-                            (editedData[item.id] &&
-                              editedData[item.id]?.subcategory) !== undefined
-                              ? editedData[item.id]?.subcategory
-                              : item.subcategory
-                          }
-                          onChange={(e) =>
-                            handleInputChange(
-                              item.id,
-                              "subcategory",
-                              e.target.value
-                            )
-                          }
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div>{item.published}</div>
-                    {editItemId === item.id ? (
-                      <div>
-                        <label htmlFor="published">
-                          {" "}
-                          Is the item published?
-                        </label>
-                        <input
-                          type="checkbox"
-                          name="published"
-                          value="published"
-                        ></input>
-                      </div>
-                    ) : null}
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (editItemId === item.id) {
-                        setEditItemId(null); // Close the edit option
-                      } else {
-                        setEditItemId(item.id); // Open the edit option for this item
-                      }
-                    }}
-                  >
-                    {editItemId === item.id ? "Cancel Edit" : "Edit Product"}
-                  </button>
-                  {editItemId === item.id ? (
-                    <button type="submit">Submit changes</button>
-                  ) : null}
+                      /> */}
                 </div>
-              </form>
+                <p className="mt-2 text-xs font-medium text-black">
+                  {item.content}
+                </p>
+                <p className="mt-3 text-base font-roboto font-medium text-black">
+                  € {item.price}
+                </p>
+              </div>
               <button onClick={() => deleteItem(item.id)}>Delete item</button>
+              <button onClick={() => startEditing(item)}>Edit item</button>
             </div>
           );
         })}
