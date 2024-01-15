@@ -35,6 +35,18 @@ const appRouter = router({
     return data;
   }),
 
+  getAllNewItems: publicProcedure.query(async () => {
+    const data = await prisma.item.findMany({
+      include: {
+        images: true,
+      },
+      where: {
+        new: true,
+      },
+    });
+    return data;
+  }),
+
   ///
   /// Cart operations ///
   ///
@@ -487,6 +499,7 @@ const appRouter = router({
             };
           }),
           mode: "payment",
+          allow_promotion_codes: true,
           success_url: `http://localhost:3000/`,
           cancel_url: `http://localhost:3000/`,
         });

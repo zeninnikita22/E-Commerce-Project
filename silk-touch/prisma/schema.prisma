@@ -23,6 +23,7 @@ model Item {
   priceIdStrapi String?    @default("")
   published   Boolean     @default(false)
   categoryId  Int         @default(0)
+new Boolean @default(false)
   category    Category   @relation(fields: [categoryId], references: [id]) 
   cartitems   CartItem[]
   favorites   Favorites[]

@@ -78,8 +78,8 @@ export default function Favorites() {
 
   if (!isSignedIn) {
     return (
-      <div>
-        <h1 className="text-xl font-bold font-quicksand mt-12 ml-12">
+      <>
+        <h1 className="text-xl font-bold font-quicksand mt-8 text-center">
           Favorites
         </h1>
         <div className="realtive flex justify-center items-center pt-12">
@@ -94,15 +94,15 @@ export default function Favorites() {
             </SignInButton>
           </div>
         </div>
-      </div>
+      </>
     );
   } else if (favoritesQuery.data?.length == 0) {
     return (
       <>
-        <h1 className="text-xl font-bold font-quicksand mt-12 ml-12">
+        <h1 className="text-xl font-bold font-quicksand mt-8 text-center">
           Favorites
         </h1>
-        <p className="my-12 mx-12 text-gray-500">
+        <p className="my-12 mx-12 text-gray-500 text-center">
           There are no products in your favorites.
         </p>
       </>

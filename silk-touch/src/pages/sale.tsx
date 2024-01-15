@@ -7,9 +7,5 @@ export default function Sale() {
   const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
 
-  return (
-    <div>
-      <SignInButton />
-    </div>
-  );
+  return <div></div>;
 }
