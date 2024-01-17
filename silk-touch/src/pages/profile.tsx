@@ -1,11 +1,8 @@
-import { trpc } from "./utils/trpc";
-import { useQueryClient } from "@tanstack/react-query";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { UserProfile } from "@clerk/nextjs";
 
 export default function Profile() {
-  const { isLoaded, isSignedIn, user } = useUser();
-  const queryClient = useQueryClient();
+  const { isSignedIn } = useUser();
 
   return (
     <div className="flex justify-center items-center">

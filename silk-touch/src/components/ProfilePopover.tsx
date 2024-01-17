@@ -1,24 +1,16 @@
-import React from "react";
-
-import { Fragment, useEffect, useRef } from "react";
-import { useState } from "react";
+import { Fragment } from "react";
 
 import { Transition, Popover } from "@headlessui/react";
 
 import { useRouter } from "next/router";
-import { trpc } from "../pages/utils/trpc";
 
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { useClerk } from "@clerk/clerk-react";
 import { useUser } from "@clerk/nextjs";
-import { SignIn } from "@clerk/clerk-react";
-import { useUserId } from "../pages/UserContext";
 
 export default function ProfilePopover() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const { signOut } = useClerk();
-  const [isPopoverOpen, setPopoverOpen] = useState(false);
-  const userId = useUserId();
 
   const router = useRouter();
 
@@ -28,12 +20,7 @@ export default function ProfilePopover() {
 
   const handleLogout = async () => {
     await signOut();
-    // Redirect to the home page (or any other page) with a query parameter
   };
-
-  const popoverPosition = `absolute mt-5 w-screen ${
-    isSignedIn ? "max-w-sm" : "max-w-sm"
-  } ${isSignedIn ? "right-0" : "right-0"} px-4 sm:px-0 lg:max-w-l`;
 
   return (
     <Popover className="relative">

@@ -1,36 +1,25 @@
 import Sort from "../components/Sort";
 import { useState } from "react";
-import AboutUsCard from "../components/AboutUsCard";
-import Products from "../components/Products";
 import React from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-// import { UserButton } from "@clerk/nextjs";
-// import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
+
 import { useRouter } from "next/router";
 import { Item } from "@prisma/client";
 import { useUserId } from "../pages/UserContext";
 
 export default function New() {
   const [sortInput, setSortInput] = useState("");
-  // const { isLoaded, isSignedIn, user } = useUser();
-  // const user = useUser();
+
   const userId = useUserId();
-  const router = useRouter();
+
   const queryClient = useQueryClient();
-  const itemsQuery = trpc.getAllItems.useQuery();
   const newItemsQuery = trpc.getAllNewItems.useQuery();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery({
     userId: userId,
   });
-
-  // Logging out all the results of requests
-  // console.log("items", itemsQuery.data);
-  // console.log("favorites", favoritesQuery.data);
-  // console.log("cart", cartQuery.data);
 
   function addToCart(item: Item) {
     const cartElement = cartQuery.data?.find(
@@ -46,18 +35,11 @@ export default function New() {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );
   }
 
-  // Optionally, handle loading state
-  // if (!isLoaded) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // User-specific content (e.g., user's name or profile link) can be rendered conditionally
   return (
     <>
       <h1 className="text-xl font-bold font-quicksand mt-8 text-center">

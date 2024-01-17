@@ -1,22 +1,20 @@
 import { trpc } from "../../utils/trpc";
-import { useUser } from "@clerk/nextjs";
 import prisma from "../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useUserId } from "../../UserContext";
+import { Category, Item } from "@prisma/client";
 
-export default function Category({ category }) {
+export default function Category({ category }: any) {
+  const userId = useUserId();
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-
-  // const { isLoaded, isSignedIn, user } = useUser();
-  const userId = useUserId();
 
   const cartQuery = trpc.getCartItems.useQuery({
     userId: userId,
   });
 
-  function addToCart(item) {
+  function addToCart(item: Item) {
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.id
     );
@@ -30,7 +28,6 @@ export default function Category({ category }) {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );
@@ -59,7 +56,7 @@ export default function Category({ category }) {
         <Link href={`/categories/${category.id}`}>
           {category.name
             .split("&")
-            .map((word, i) =>
+            .map((word: any, i: any) =>
               i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
             )
             .join(" & ")}
@@ -67,7 +64,7 @@ export default function Category({ category }) {
       </div>
       <div className="container mx-auto px-12 py-12">
         <div className="grid grid-cols-1 gap-x-2 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-2">
-          {category.items.map((item) => {
+          {category.items.map((item: any) => {
             return (
               <div key={item.id}>
                 <div className="flex flex-col items-center">
@@ -111,7 +108,6 @@ export default function Category({ category }) {
 
 export async function getStaticPaths() {
   const categories = await prisma.category.findMany();
-  // console.log("getStaticPaths prisma", categories);
 
   const paths = categories.map((category) => ({
     params: { categoryId: category.id.toString() },
@@ -120,10 +116,10 @@ export async function getStaticPaths() {
   return { paths, fallback: true };
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params }: any) {
   const category = await prisma.category.findUnique({
     where: {
-      id: parseInt(params.categoryId, 10), // Ensure to parse the ID as an integer, if it's stored as an integer in your database
+      id: parseInt(params.categoryId, 10),
     },
     include: {
       items: {
@@ -133,7 +129,6 @@ export async function getStaticProps({ params }) {
       },
     },
   });
-  // console.log("GetStaticProps Category:", category);
   if (!category) {
     return {
       notFound: true, // This will render a 404 page if no category with the given ID is found

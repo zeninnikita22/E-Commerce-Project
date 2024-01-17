@@ -31,7 +31,6 @@ const appRouter = router({
       },
     });
 
-    // console.log({ serverData: data });
     return data;
   }),
 
@@ -92,7 +91,6 @@ const appRouter = router({
             },
           });
         }
-        console.log("Item added to cart");
       } catch (error) {
         console.error("Error adding item to cart:", error);
       }
@@ -133,11 +131,10 @@ const appRouter = router({
               // If quantity is 1, remove the cart item
               await prisma.cartItem.update({
                 where: { id: cartItemToDecrease.id },
-                data: { quantity: 0 }, /// Does it remove on 0?
+                data: { quantity: 0 },
               });
             }
           }
-          console.log("Item deleted from cart");
         }
       } catch (error) {
         console.error("Error deleting item from cart:", error);
@@ -176,11 +173,11 @@ const appRouter = router({
             throw new Error("No such item in a cart");
           }
         }
-        console.log("Updated quantity of items in a cart");
       } catch (error) {
         console.error("Error updating quantity of items in a cart:", error);
       }
     }),
+
   deleteCartItem: publicProcedure
     .input(
       z.object({
@@ -211,12 +208,11 @@ const appRouter = router({
             throw new Error("No such item in a cart");
           }
         }
-
-        console.log("Item deleted from cart");
       } catch (error) {
         console.error("Error deleting item from cart:", error);
       }
     }),
+
   getCartItems: publicProcedure
     .input(
       z.object({
@@ -263,8 +259,6 @@ const appRouter = router({
             userId: authorizedUserId,
           },
         });
-
-        console.log("Cart items migrated: ", updatedCartItems);
         return updatedCartItems;
       } catch (error) {
         console.error("Error migrating cart items: ", error);
@@ -340,8 +334,6 @@ const appRouter = router({
             },
           });
         }
-
-        console.log("Item added to favorites");
       } catch (error) {
         console.error("Error adding item to favorites", error);
       }
@@ -382,8 +374,6 @@ const appRouter = router({
           // If the item doesn't exist, error!
           throw new Error("Such item is not in the favorites");
         }
-
-        console.log("Item deleted from favorites");
       } catch (error) {
         console.error("Error deleting item from favorites", error);
       }
@@ -488,9 +478,8 @@ const appRouter = router({
     )
     .mutation(async ({ input }) => {
       const cartItems = input.cartItems;
-      // console.log(cartItems);
       try {
-        // Create Checkout Sessions from body params.
+        // Create Checkout Sessions from body params
         const session = await stripe.checkout.sessions.create({
           line_items: cartItems.map((item) => {
             return {
@@ -504,9 +493,7 @@ const appRouter = router({
           cancel_url: `http://localhost:3000/`,
         });
         return session;
-        // res.redirect(303, session.url);
       } catch (error) {
-        // console.log(error);
         throw new Error("Checkout error!");
       }
     }),

@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { trpc } from "../pages/utils/trpc";
-import { useQueryClient } from "@tanstack/react-query";
-// import { UserButton } from "@clerk/nextjs";
-// import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
 
 const Search = () => {
   const [searchInput, setSearchInput] = useState("");
-  const { isLoaded, isSignedIn, user } = useUser();
-  const queryClient = useQueryClient();
   const itemsQuery = trpc.getAllItems.useQuery();
 
-  function findItem(value) {
-    console.log("finditem", value);
+  function findItem(value: string) {
     setSearchInput(value);
   }
 

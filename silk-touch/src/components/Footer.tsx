@@ -6,6 +6,7 @@ import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 import { trpc } from "../pages/utils/trpc";
 
 const Footer = () => {
+  // Fetching categories to display them in the right side of footer
   const itemsCategoriesQuery = trpc.getAllCategoriesItems.useQuery();
 
   return (

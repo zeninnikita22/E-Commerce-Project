@@ -1,25 +1,16 @@
-import React, { useState, useEffect } from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-import { UserButton } from "@clerk/nextjs";
-import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
-import { loadStripe } from "@stripe/stripe-js";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useUserId } from "../pages/UserContext";
 
-const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
+const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }: any) => {
   const router = useRouter();
   const userId = useUserId();
-  const { isLoaded, isSignedIn, user } = useUser();
 
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  );
-
+  /// Queries and mutations adding, deleting, changing the number and checking out products
   const decreaseCartItemQuantityMutation = trpc.decreaseCartItem.useMutation();
   const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
@@ -27,87 +18,84 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
     trpc.updateCartItemQuantity.useMutation();
   const createCheckoutSessionMutation =
     trpc.createCheckoutSession.useMutation();
-  const queryClient = useQueryClient();
 
+  const queryClient = useQueryClient();
   const cartQuery = trpc.getCartItems.useQuery({
     userId: userId,
   });
 
-  function addToCart(element) {
+  // Functions to add, delete, change quantity of products in the cart
+  function addToCart(item: any) {
     const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === element.item.id
+      (element) => element.itemId === item.item.id
     );
     addItemToCartMutation.mutate(
       {
         userId: userId,
-        itemId: element.item.id,
+        itemId: item.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );
   }
 
-  function decreaseItemQuantity(element) {
+  function decreaseItemQuantity(item: any) {
     const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === element.item.id
+      (element) => element.itemId === item.item.id
     );
     decreaseCartItemQuantityMutation.mutate(
       {
         userId: userId,
-        itemId: element.item.id,
+        itemId: item.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Decrased item", data);
         },
       }
     );
   }
 
-  function deleteFromCart(element) {
+  function deleteFromCart(item: any) {
     const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === element.item.id
+      (element) => element.itemId === item.item.id
     );
     deleteItemFromCartMutation.mutate(
       {
         userId: userId,
-        itemId: element.item.id,
+        itemId: item.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
       },
       {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["deleteCartItem"] });
-          console.log("Deleted item", data);
         },
       }
     );
   }
 
-  function changeItemQuantity({ e, element }) {
+  function changeItemQuantity({ e, item }: any) {
     const cartElement = cartQuery.data?.find(
-      (element) => element.itemId === element.item.id
+      (element) => element.itemId === item.item.id
     );
     let quantityValue = e.target.value;
 
     if (quantityValue === "") {
       quantityValue = "0"; // Default value when the input is cleared
-      console.log("No value!");
     }
 
     changeCartItemQuantityMutation.mutate(
       {
         userId: userId,
-        itemId: element.item.id,
+        itemId: item.item.id,
         cartItemId: cartElement === undefined ? "" : cartElement?.id,
         quantity: Number(quantityValue),
       },
@@ -115,21 +103,28 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          // console.log("Deleted item", data);
         },
       }
     );
   }
 
   function checkout() {
-    const cartItems = cartQuery.data?.map((cartItem) => ({
-      quantity: cartItem.quantity,
-      priceIdStrapi: cartItem.item.priceIdStrapi,
-    }));
+    // Ensure cartQuery.data is not undefined and filter out items with null or undefined priceIdStrapi
+    const filteredCartItems = cartQuery.data
+      ? cartQuery.data
+          .filter(
+            (cartItem) => cartItem.quantity > 0 && cartItem.item.priceIdStrapi
+          )
+          .map((cartItem) => ({
+            quantity: cartItem.quantity,
+            priceIdStrapi: cartItem.item.priceIdStrapi as string,
+          }))
+      : [];
 
+    // Conduct checkout
     createCheckoutSessionMutation.mutate(
       {
-        cartItems, // Pass the cart items as an array
+        cartItems: filteredCartItems, // Pass the filtered cart items as an array
       },
       {
         onSuccess: (data) => {
@@ -205,12 +200,12 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                   Your cart is empty
                                 </p>
                               ) : (
-                                cartQuery.data?.map((element) => {
+                                cartQuery.data?.map((item) => {
                                   return (
-                                    <li key={element.id} className="flex py-6">
+                                    <li key={item.id} className="flex py-6">
                                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                         <img
-                                          src={`${element.item.images[0].url}`}
+                                          src={`${item.item.images[0].url}`}
                                           alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
                                           className="h-full w-full object-cover object-center"
                                         />
@@ -219,27 +214,20 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                         <div>
                                           <div className="flex justify-between text-base font-medium text-gray-900">
                                             <h3>
-                                              <a href="#">
-                                                {element.item.title}
-                                              </a>
+                                              <a href="#">{item.item.title}</a>
                                             </h3>
                                             <p className="ml-4">
-                                              €
-                                              {element.item.price *
-                                                element.quantity}
+                                              €{item.item.price * item.quantity}
                                             </p>
                                           </div>
                                           <p className="mt-1 text-sm text-gray-500">
-                                            {element.item.content}
+                                            {item.item.content}
                                           </p>
                                         </div>
                                         <div className="flex flex-1 items-end justify-between text-sm">
-                                          {/* <p className="text-gray-500">
-                                        Qty {element.quantity}
-                                      </p> */}
                                           <div>
                                             <button
-                                              onClick={() => addToCart(element)}
+                                              onClick={() => addToCart(item)}
                                               className="text-xs font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
                                             >
                                               <svg
@@ -260,26 +248,25 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                             <input
                                               className="appearance-none border p-1 text-center font-medium font-quicksand mx-4 w-1/6"
                                               type="number"
-                                              // min=""
                                               max="99"
                                               value={
                                                 cartQuery.data?.filter(
                                                   (cartItem) =>
                                                     cartItem.itemId ===
-                                                    element.item.id
+                                                    item.item.id
                                                 )[0].quantity
                                               }
                                               onChange={(e) =>
                                                 changeItemQuantity({
                                                   e,
-                                                  element,
+                                                  item,
                                                 })
                                               }
                                             ></input>
                                             <button
                                               className="text-sm font-medium bg-off-white rounded py-2 px-2 hover:bg-pistachio"
                                               onClick={() =>
-                                                decreaseItemQuantity(element)
+                                                decreaseItemQuantity(item)
                                               }
                                             >
                                               <svg
@@ -304,7 +291,7 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                                               type="button"
                                               className="font-medium text-black hover:text-pistachio"
                                               onClick={() =>
-                                                deleteFromCart(element)
+                                                deleteFromCart(item)
                                               }
                                             >
                                               Delete
@@ -336,7 +323,12 @@ const ShoppingCart = ({ openShoppingCart, setOpenShoppingCart }) => {
                         <div className="mt-6">
                           <button
                             onClick={() => checkout()}
-                            className="flex items-center justify-center rounded-md transition-colors duration-400 border border-transparent bg-pistachio px-6 py-3 text-base font-medium text-black shadow-sm hover:bg-black hover:text-white"
+                            className={`flex items-center justify-center rounded-md transition-colors duration-400 border border-transparent px-6 py-3 text-base font-medium shadow-sm ${
+                              cartQuery.data?.length === 0
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-pistachio hover:bg-black hover:text-white text-black"
+                            }`}
+                            disabled={cartQuery.data?.length === 0}
                           >
                             Checkout
                           </button>

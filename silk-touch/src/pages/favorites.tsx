@@ -2,18 +2,14 @@ import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignInButton, useUser } from "@clerk/nextjs";
 import { useUserId } from "./UserContext";
-import { Item } from "@prisma/client";
+import { Favorites, Item } from "@prisma/client";
 
 export default function Favorites() {
   const { user, isSignedIn } = useUser();
   const userId = useUserId();
 
-  // const deleteItemFromFavoritesMuattion =
-  //   trpc.deleteFromFavorites.useMutation();
-  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
-
   const queryClient = useQueryClient();
-
+  const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery(
@@ -27,22 +23,20 @@ export default function Favorites() {
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery(
     {
-      userId: user?.id,
+      userId: user?.id || "",
     },
     {
       enabled: !!userId,
     }
   );
 
-  function changeFavorites(item) {
+  function changeFavorites(item: Favorites & { item: Item }) {
     const favoritesElement = favoritesQuery.data?.find(
       (element) => element.item.id === item.item.id
     );
-    console.log("Favorites element is", favoritesElement);
-    console.log("Button changeFavorites clicked", item);
     changeFavoritesItemsMutation.mutate(
       {
-        userId: user?.id,
+        userId: user?.id || "",
         itemId: item.item.id,
         favoritesId: favoritesElement === undefined ? "" : favoritesElement?.id,
       },
@@ -50,13 +44,12 @@ export default function Favorites() {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
-          console.log("Add to favorites OnSuccess", data);
         },
       }
     );
   }
 
-  function addToCart(item: Item) {
+  function addToCart(item: Favorites & { item: Item }) {
     const cartElement = cartQuery.data?.find(
       (element) => element.itemId === item.item.id
     );
@@ -70,7 +63,6 @@ export default function Favorites() {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );

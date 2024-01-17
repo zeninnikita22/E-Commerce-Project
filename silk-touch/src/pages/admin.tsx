@@ -3,6 +3,7 @@ import Products from "@/components/admin/Products";
 import Feedback from "@/components/admin/Feedback";
 import { trpc } from "./utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
+import { SignInButton, useUser } from "@clerk/nextjs";
 
 const navigationItems = [
   {
@@ -50,7 +51,21 @@ const navigationItems = [
 
 export default function PageLayout() {
   const [activeComponent, setActiveComponent] = useState("Products");
+  const { user } = useUser();
 
+  if (user?.id !== "user_2VG30N54vdFrI0AO0O0Wn1ldRzN") {
+    return (
+      <div className="text-center mt-16">
+        <h3>Please log in as an admin</h3>
+
+        <SignInButton>
+          <button className="rounded-full bg-night text-off-white font-normal py-2 px-4 mt-2">
+            Log in
+          </button>
+        </SignInButton>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-1">
       {/* Sidebar */}

@@ -1,38 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trpc } from "../../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function Products() {
+  interface Item {
+    id: number;
+    title: string;
+    content: string;
+    price: number;
+    categoryId: number;
+    published: boolean;
+    new: boolean;
+  }
+
+  const queryClient = useQueryClient();
+  const itemsQuery = trpc.getAllItems.useQuery();
   const createItemMutation = trpc.createItem.useMutation();
   const updateItemMutation = trpc.updateItem.useMutation();
   const deleteItemMutation = trpc.deleteItem.useMutation();
-  const itemsQuery = trpc.getAllItems.useQuery();
-  const queryClient = useQueryClient();
 
-  const [editingItem, setEditingItem] = useState(null);
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [createFormOpen, setCreateFormOpen] = useState(false);
-  const [editingItemId, setEditingItemId] = useState(null);
 
   const toggleCreateForm = () => {
     setCreateFormOpen(!createFormOpen);
   };
 
-  const toggleEditForm = (item) => {
-    // If the clicked item is already being edited, close the form
+  const toggleEditForm = (item: any) => {
     if (editingItem?.id === item.id) {
       setEditingItem(null);
     } else {
-      // Otherwise, open the form for the clicked item
       setEditingItem(item);
     }
   };
 
-  //   console.log("Admin panel - items query", itemsQuery.data);
-  console.log("Editing item id", editingItemId);
+  /// CRUD functions
 
   function createItem(e: any) {
     e.preventDefault();
-    console.log("Create item event", e);
     createItemMutation.mutate(
       {
         title: e.target[0].value,
@@ -45,10 +50,9 @@ export default function Products() {
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: ["getAllItems"] });
-          console.log("Admin panel - add new item OnSuccess", data);
+
           // Reset the form fields
           e.target.reset();
-
           // Close the form
           setCreateFormOpen(false);
         },
@@ -58,7 +62,6 @@ export default function Products() {
 
   function editItem(e: any, itemId: number) {
     e.preventDefault();
-    console.log("Edit item event", e, itemId);
     updateItemMutation.mutate(
       {
         itemId: itemId,
@@ -72,14 +75,14 @@ export default function Products() {
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: ["getAllItems"] });
-          console.log("Admin panel - update item OnSuccess", data);
+          // Close the form
+          setEditingItem(null);
         },
       }
     );
   }
 
   function deleteItem(id: number) {
-    console.log(id);
     deleteItemMutation.mutate(
       {
         itemId: id,
@@ -87,17 +90,17 @@ export default function Products() {
       {
         onSuccess: (data) => {
           queryClient.invalidateQueries({ queryKey: ["getAllItems"] });
-          console.log("Admin panel - delete item OnSuccess", data);
         },
       }
     );
   }
 
   if (itemsQuery.isLoading && !itemsQuery.data) {
-    return <div>...</div>;
+    return <div>Loading...</div>;
   } else {
     return (
       <div>
+        {/* Button to open form for creating a product */}
         <button
           onClick={toggleCreateForm}
           className="flex gap-3 bg-pistachio text-black font-raleway font-medium py-2 px-4 rounded-full border border-transparent transition hover:border-black hover:border-opacity-100 mb-4"
@@ -135,7 +138,7 @@ export default function Products() {
             </svg>
           )}
         </button>
-        {/* Form for creating an item */}
+        {/* Form for creating a product */}
         {createFormOpen && (
           <form
             className="flex flex-col rounded-lg bg-off-white transition duration-200 shadow-lg border border-transparent px-6 py-3"
@@ -237,60 +240,12 @@ export default function Products() {
               className="my-2 transition-transform w-1/5 duration-800 transform hover:scale-105 rounded-full bg-night text-off-white font-normal py-2 px-8"
               type="submit"
             >
-              Create an item
+              Create a product
             </button>
           </form>
         )}
 
-        {/* Edit Item Form */}
-        {/* {editingItem && (
-          <form onSubmit={(e) => editItem(e, editingItem.id)}>
-            <h2>Edit an item</h2>
-            <label htmlFor="title">Title of item</label>
-            <input type="text" name="title" defaultValue={editingItem.title} />
-            <label htmlFor="content">Content of item</label>
-            <input
-              type="text"
-              name="content"
-              defaultValue={editingItem.content}
-            />
-
-            <label htmlFor="price">Price of item</label>
-            <input
-              type="number"
-              name="price"
-              defaultValue={editingItem.price}
-            />
-
-            <label htmlFor="categoryId">Category ID of item</label>
-            <input
-              type="number"
-              name="categoryId"
-              defaultValue={editingItem.categoryId}
-            />
-
-            <label htmlFor="published">Is the item published?</label>
-            <input
-              type="checkbox"
-              name="published"
-              defaultChecked={editingItem.published}
-            />
-
-            <label htmlFor="new">Is the item new?</label>
-            <input
-              type="checkbox"
-              name="new"
-              defaultChecked={editingItem.new}
-            />
-
-            <button type="submit">Update item</button>
-            <button type="button" onClick={stopEditing}>
-              Cancel
-            </button>
-          </form>
-        )} */}
-
-        {/* List of items */}
+        {/* List of products */}
         <div>
           <h1 className="text-lg font-semibold font-quicksand mt-8 text-center">
             List of products
@@ -362,56 +317,88 @@ export default function Products() {
                   </button>
                 </div>
               </div>
+              {/* Form for editing a product */}
               {editingItem?.id === item.id && (
                 <form
                   onSubmit={(e) => editItem(e, item.id)}
-                  className="flex flex-wrap w-3/4 bg-white p-4 rounded-lg shadow-md border border-gray-200 space-y-4"
+                  className="flex flex-wrap justify-between w-3/4 bg-off-white p-4 rounded-lg shadow-md border border-gray-200 text-sm"
                 >
-                  <label htmlFor="title">Title of item</label>
-                  <input
-                    type="text"
-                    name="title"
-                    defaultValue={editingItem.title}
-                  />
-                  <label htmlFor="content">Content of item</label>
-                  <input
-                    type="text"
-                    name="content"
-                    defaultValue={editingItem.content}
-                  />
+                  <div className="flex flex-col justify-center">
+                    <label htmlFor="title">Title of the product</label>
+                    <input
+                      type="text"
+                      name="title"
+                      defaultValue={editingItem.title}
+                      className="mt-1 py-1 px-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-500 text-sm"
+                    />
+                    <label htmlFor="content" className="mt-2">
+                      Product description
+                    </label>
+                    <input
+                      type="text"
+                      name="content"
+                      defaultValue={editingItem.content}
+                      className="mt-1 py-1 px-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-500 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <label htmlFor="price">Price of item (€)</label>
+                    <input
+                      type="number"
+                      name="price"
+                      defaultValue={editingItem.price}
+                      className="mt-1 py-1 px-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-500 text-sm"
+                    />
 
-                  <label htmlFor="price">Price of item</label>
-                  <input
-                    type="number"
-                    name="price"
-                    defaultValue={editingItem.price}
-                  />
+                    <label htmlFor="category" className="mt-2">
+                      Category of the product
+                    </label>
+                    <select
+                      name="category"
+                      className="mt-1 py-1 px-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-500 text-sm"
+                      defaultValue={editingItem.categoryId}
+                    >
+                      <option value="1">Pillows and blankets</option>
+                      <option value="2">Bedding</option>
+                      <option value="3">Towels</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <div className="flex gap-2">
+                      <label htmlFor="published">
+                        Is the product published?
+                      </label>
+                      <input
+                        type="checkbox"
+                        name="published"
+                        defaultChecked={editingItem.published}
+                      />
+                    </div>
 
-                  <label htmlFor="categoryId">Category ID of item</label>
-                  <input
-                    type="number"
-                    name="categoryId"
-                    defaultValue={editingItem.categoryId}
-                  />
-
-                  <label htmlFor="published">Is the item published?</label>
-                  <input
-                    type="checkbox"
-                    name="published"
-                    defaultChecked={editingItem.published}
-                  />
-
-                  <label htmlFor="new">Is the item new?</label>
-                  <input
-                    type="checkbox"
-                    name="new"
-                    defaultChecked={editingItem.new}
-                  />
-
-                  <button type="submit">Update item</button>
-                  <button type="button" onClick={() => setEditingItemId(null)}>
-                    Cancel
-                  </button>
+                    <div className="flex gap-2 mt-2">
+                      <label htmlFor="new">Is the product new?</label>
+                      <input
+                        type="checkbox"
+                        name="new"
+                        defaultChecked={editingItem.new}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <button
+                      type="submit"
+                      className="rounded-full bg-night text-off-white font-normal py-2 px-4"
+                    >
+                      Update item
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-full bg-night text-off-white font-normal py-2 px-4 mt-2"
+                      onClick={() => setEditingItem(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </form>
               )}
             </div>

@@ -1,13 +1,12 @@
 import { trpc } from "../../../../utils/trpc";
 import prisma from "../../../../../../lib/prisma";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Category, Item, ItemImage } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
 import { useUserId } from "../../../../UserContext";
-import { Dialog, Transition, Fragment } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 
 export default function Product({
   product,
@@ -18,15 +17,11 @@ export default function Product({
 }) {
   const { isSignedIn, user } = useUser();
   const userId = useUserId();
+
   let [dialogIsOpen, setDialogIsOpen] = useState(false);
-  // console.log(userId);
-  // const [userId, setUserId] = useState("");
 
   const queryClient = useQueryClient();
   const addItemToCartMutation = trpc.addCartItem.useMutation();
-  // const [numberOfCartItems, setNumberOfCartItems] = useState(0);
-  const itemsQuery = trpc.getAllItems.useQuery();
-  // const deleteItemFromCartMutation = trpc.deleteCartItem.useMutation();
   const changeFavoritesItemsMutation = trpc.changeFavorites.useMutation();
 
   const cartQuery = trpc.getCartItems.useQuery(
@@ -40,7 +35,7 @@ export default function Product({
 
   const favoritesQuery = trpc.getFavoritesItems.useQuery(
     {
-      userId: user?.id,
+      userId: user?.id || "",
     },
     {
       enabled: !!user?.id,
@@ -62,7 +57,6 @@ export default function Product({
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );
@@ -71,7 +65,6 @@ export default function Product({
   function changeFavorites(item: Item) {
     if (!isSignedIn) {
       setDialogIsOpen(true);
-      console.log(dialogIsOpen);
     } else {
       const favoritesElement = favoritesQuery.data?.find(
         (element) => element.itemId === item.id
@@ -88,16 +81,11 @@ export default function Product({
           onSuccess: (data) => {
             // Invalidate specific queries after the mutation is successful
             queryClient.invalidateQueries({ queryKey: ["getFavoritesItems"] });
-            console.log("Add to favorites OnSuccess", data);
           },
         }
       );
     }
   }
-
-  // console.log("ITEMS QUERY", itemsQuery.data);
-  // console.log(favoritesQuery.data);
-  // console.log(product);
 
   const [selectedImage, setSelectedImage] = useState(product?.images[0]);
 
@@ -229,24 +217,13 @@ export default function Product({
         </div>
       </div>
       <>
-        {/* <div className="fixed inset-0 flex items-center justify-center">
-          <button
-            type="button"
-            onClick={() => setDialogIsOpen(true)}
-            className="rounded-md bg-black/20 px-4 py-2 text-sm font-medium text-white hover:bg-black/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
-          >
-            Open dialog
-          </button>
-        </div> */}
-
-        <Transition appear show={dialogIsOpen} as={Fragment}>
+        <Transition appear show={dialogIsOpen}>
           <Dialog
             as="div"
             className="relative z-10"
             onClose={() => setDialogIsOpen(false)}
           >
             <Transition.Child
-              as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0"
               enterTo="opacity-100"
@@ -260,7 +237,6 @@ export default function Product({
             <div className="fixed inset-0 overflow-y-auto">
               <div className="flex min-h-full items-center justify-center p-4 text-center">
                 <Transition.Child
-                  as={Fragment}
                   enter="ease-out duration-300"
                   enterFrom="opacity-0 scale-95"
                   enterTo="opacity-100 scale-100"
@@ -275,26 +251,6 @@ export default function Product({
                     >
                       Please log in to add products to your favorites
                     </Dialog.Title>
-                    {/* <button
-                      onClick={() => setDialogIsOpen(false)}
-                      className="absolute -top-4 right-0 m-2 rounded-full bg-gray-100 p-2 text-gray-700 hover:bg-gray-200 focus:outline-none"
-                      aria-label="Close"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-4 h-4"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button> */}
                     <div className="flex justify-evenly">
                       <div className="mt-6">
                         <SignInButton>
@@ -348,8 +304,7 @@ export async function getStaticPaths() {
   return { paths, fallback: true };
 }
 
-//@ts-ignore FIX ME PLEASE
-export async function getStaticProps({ params }) {
+export async function getStaticProps({ params }: any) {
   // Destructure params to extract categoryId and productId
   const { categoryId, productId } = params;
 

@@ -1,33 +1,27 @@
-import React from "react";
-
 import { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 
-import { Disclosure, Menu, Transition, Popover } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
+
 import { trpc } from "../pages/utils/trpc";
 
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { useClerk } from "@clerk/clerk-react";
 import { useUser } from "@clerk/nextjs";
-import { SignIn, SignUp } from "@clerk/clerk-react";
 import { useUserId } from "../pages/UserContext";
 
 import Search from "./Search";
 import ShoppingCart from "./ShoppingCart";
-import Image from "next/image";
-import UserIcon from "../../public/user.png";
-import Link from "next/link";
 import ProfilePopover from "./ProfilePopover";
 
-import { FaCloudUploadAlt, FaCog, FaSignOutAlt } from "react-icons/fa";
-
+// Add new elements to this array to add new items in the navbar
 const navigation = [
   { name: "New", href: "/new", current: false },
-  { name: "Sale", href: "/sale", current: false },
   { name: "About Us", href: "/about", current: false },
 ];
 
@@ -39,17 +33,15 @@ export default function Navigation() {
   const [iconIsHovered, setIconIsHovered] = useState(false);
   const [openShoppingCart, setOpenShoppingCart] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const router = useRouter();
-  // console.log(user);
 
-  // if (!user) {
-  //   return <div>Loading</div>;
-  // }
   const popoverButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { isLoaded, isSignedIn } = useUser();
+  const userId = useUserId();
+  const { signOut } = useClerk();
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -72,8 +64,6 @@ export default function Navigation() {
     }
   }, [isLoaded, isSignedIn, isPopoverOpen]);
 
-  const userId = useUserId();
-
   const cartQuery = trpc.getCartItems.useQuery({
     userId: userId,
   });
@@ -82,21 +72,6 @@ export default function Navigation() {
   const redirectToFavorites = () => {
     router.push("/favorites");
   };
-
-  const redirectToProfile = () => {
-    router.push("/profile");
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    // You can redirect or perform other actions after successful logout
-  };
-
-  // console.log("Categories", categoriesQuery.data);
-
-  const popoverPosition = `absolute mt-5 w-screen ${
-    isSignedIn ? "max-w-xs" : "max-w-sm"
-  } ${isSignedIn ? "right-0" : "right-10"} px-4 sm:px-0 lg:max-w-l`;
 
   return (
     <>
@@ -155,7 +130,6 @@ export default function Navigation() {
                                 } transition-colors duration-300 ease-in-out`}
                               >
                                 Shop All
-                                {/* Issue with hovering both of them !!!!!*/}
                                 <ChevronDownIcon
                                   className={`-mr-1 h-5 w-5 ${
                                     iconIsHovered

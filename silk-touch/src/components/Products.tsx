@@ -1,36 +1,19 @@
 import React from "react";
 import { trpc } from "../pages/utils/trpc";
 import { useQueryClient } from "@tanstack/react-query";
-// import { UserButton } from "@clerk/nextjs";
-// import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/router";
 import { Item } from "@prisma/client";
 import { useUserId } from "../pages/UserContext";
 
-const Products = ({ sortInput }) => {
-  // const user = useUser();
+const Products = ({ sortInput }: any) => {
   const userId = useUserId();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const itemsQuery = trpc.getAllItems.useQuery();
-  // const itemsQuery = trpc.getAllItems.useQuery(undefined, {
-  //   enabled: !!user.isSignedIn,
-  // });
-  const addItemToCartMutation = trpc.addCartItem.useMutation();
 
+  const queryClient = useQueryClient();
+
+  const itemsQuery = trpc.getAllItems.useQuery();
+  const addItemToCartMutation = trpc.addCartItem.useMutation();
   const cartQuery = trpc.getCartItems.useQuery({
     userId: userId,
   });
-
-  // const favoritesQuery = trpc.getFavoritesItems.useQuery({
-  //   userId: user?.id,
-  // });
-
-  // Logging out all the results of requests
-  // console.log("items", itemsQuery.data);
-  // console.log("favorites", favoritesQuery.data);
-  // console.log("cart", cartQuery.data);
 
   function addToCart(item: Item) {
     const cartElement = cartQuery.data?.find(
@@ -46,31 +29,10 @@ const Products = ({ sortInput }) => {
         onSuccess: (data) => {
           // Invalidate specific queries after the mutation is successful
           queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-          console.log("Add to cart OnSuccess", data);
         },
       }
     );
   }
-  // function addToCart(item) {
-  //   const cartElement = cartQuery.data?.find(
-  //     (element) => element.itemId === item.id
-  //   );
-  //   console.log("Added");
-  //   addItemToCartMutation.mutate(
-  //     {
-  //       userId: user?.id,
-  //       itemId: item.id,
-  //       cartItemId: cartElement === undefined ? "" : cartElement?.id,
-  //     },
-  //     {
-  //       onSuccess: (data) => {
-  //         // Invalidate specific queries after the mutation is successful
-  //         queryClient.invalidateQueries({ queryKey: ["getCartItems"] });
-  //         console.log("Add to cart OnSuccess", data);
-  //       },
-  //     }
-  //   );
-  // }
 
   return (
     <div className="container mx-auto px-12 py-12">
@@ -107,7 +69,7 @@ const Products = ({ sortInput }) => {
                         <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                           <img
                             src={`${item.images[0].url}`}
-                            alt="Tall slender porcelain bottle with natural clay textured body and cork stopper."
+                            alt="Image of the product"
                             className="h-full w-full object-cover object-center group-hover:opacity-75"
                           />
                         </div>
